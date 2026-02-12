@@ -447,7 +447,14 @@ def cmd_version(args: argparse.Namespace) -> int:
     return 0
 
 
+def set_terminal_title(title: str) -> None:
+    """Set terminal title using ANSI escape sequence if TTY is detected."""
+    if sys.stderr.isatty():
+        print(f"\033]0;{title}\007", end="", file=sys.stderr, flush=True)
+
+
 def main() -> int:
+    set_terminal_title("dockman")
     parser = argparse.ArgumentParser(
         prog=SCRIPT_NAME,
         description="Simple Docker containerization CLI tool"
