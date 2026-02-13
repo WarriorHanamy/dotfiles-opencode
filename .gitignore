@@ -5,4 +5,7 @@ opencode.jsonc
 # OpenCode automatically create these files:
 bun.lock
 package.json
-node_modules
+node_modules/
+
+# Private skills
+/skills/private/
