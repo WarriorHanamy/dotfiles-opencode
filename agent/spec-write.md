@@ -42,7 +42,7 @@ The file should be stored under `specs/` with a meaningful name, e.g., `specs/fe
 
 ## Metadata
 - **Version**: <semver, e.g., 1.0.0>
-- **Status**: Draft | Active | Deprecated
+- **Status**: Draft | Active | Realized | Regressible | Deprecated
 - **Author**: <agent or user>
 - **Created**: <YYYY-MM-DD>
 - **Last Updated**: <YYYY-MM-DD>
@@ -56,16 +56,7 @@ The file should be stored under `specs/` with a meaningful name, e.g., `specs/fe
 - FR-2: ...
 
 ### Non-functional Requirements
-- NFR-1: <performance, security, etc.>
-
-## Technical Design
-<Detailed design, architecture diagrams (ASCII or references), data models, algorithms>
-
-## API Specification
-<If applicable: endpoints, request/response formats, authentication, error handling>
-
-## Implementation Guidelines
-<Coding standards, libraries, environment variables, configuration>
+- NFR-1: <architecture, performance, security, etc.>
 
 ## Test Steps
 <Step-by-step verification instructions. May be shell commands, manual actions, or both.>
@@ -78,3 +69,12 @@ The file should be stored under `specs/` with a meaningful name, e.g., `specs/fe
 |------------|---------|-------------------|------------|
 | <date>     | 1.0.0   | Initial draft     | <author>   |
 ```
+
+### 🎯 Document Quality
+
+When writting specification document:
+- Focus on **big-picture**.
+- DO NOT be too specific on implementation details.
+- Avoid ambiguous wording.
+- Include **edge cases** in test steps when appliable.
+- DO NOT hallucinate.
