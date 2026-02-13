@@ -1,0 +1,99 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "provider": {
+        "deepseek": {
+            "options": {
+                "apiKey": "{env:DEEPSEEK_API_KEY}"
+            }
+        },
+        "zhipuai-coding-plan": {
+            "options": {
+                "apiKey": "{env:Z_AI_API_KEY}"
+            }
+        }
+    },
+    "theme": "tokyonight",
+    "model": "zhipuai-coding-plan/glm-5",
+    "small_model": "zhipuai-coding-plan/glm-4.5-air",
+    "mcp": {
+        "zai-mcp-server": {
+            "type": "local",
+            "command": [
+                "npx",
+                "-y",
+                "@z_ai/mcp-server"
+            ],
+            "environment": {
+                "Z_AI_MODE": "ZHIPU",
+                "Z_AI_API_KEY": "{env:Z_AI_API_KEY}"
+            },
+            "enabled": true
+        },
+        "web-search-prime": {
+            "type": "remote",
+            "url": "https://open.bigmodel.cn/api/mcp/web_search_prime/mcp",
+            "headers": {
+                "Authorization": "Bearer {env:Z_AI_API_KEY}"
+            },
+            "enabled": true
+        },
+        "web-reader": {
+            "type": "remote",
+            "url": "https://open.bigmodel.cn/api/mcp/web_reader/mcp",
+            "headers": {
+                "Authorization": "Bearer {env:Z_AI_API_KEY}"
+            },
+            "enabled": true
+        },
+        "zread": {
+            "type": "remote",
+            "url": "https://open.bigmodel.cn/api/mcp/zread/mcp",
+            "headers": {
+                "Authorization": "Bearer {env:Z_AI_API_KEY}"
+            },
+            "enabled": true
+        },
+        "playwright": {
+            "type": "local",
+            "command": [
+                "npx",
+                "@playwright/mcp@latest"
+            ],
+            "enabled": true
+        },
+        "context7": {
+            "type": "local",
+            "command": [
+                "npx",
+                "-y",
+                "@upstash/context7-mcp",
+                "--api-key",
+                "{env:CONTEXT7_API_KEY}"
+            ],
+            "enabled": true
+        },
+        "chrome-devtools": {
+            "type": "local",
+            "command": [
+                "npx",
+                "-y",
+                "chrome-devtools-mcp@latest"
+            ],
+            "enabled": false
+        },
+        "grep": {
+            "type": "remote",
+            "url": "https://mcp.grep.app",
+            "enabled": true
+        }
+    },
+    "permission": {
+        "external_directory": {
+            "*": "ask",
+            "/tmp*": "allow",
+        }
+    },
+    "plugin": [
+        "@franlol/opencode-md-table-formatter@0.0.3"
+    ]
+}

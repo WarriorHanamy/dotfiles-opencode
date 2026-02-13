@@ -395,6 +395,9 @@ def cmd_run(args: argparse.Namespace) -> int:
     docker_cmd = [
         "sudo", "-g", "docker", "docker", "run",
         "--add-host=host.docker.internal:host-gateway",
+        "-e", "Z_AI_API_KEY",
+        "-e", "DEEPSEEK_API_KEY",
+        "-e", "CONTEXT7_API_KEY",
         "-e", f"TERM={os.environ.get('TERM', 'xterm')}",
         "-e", f"http_proxy={fix_proxy_for_docker(os.environ.get('http_proxy', ''))}",
         "-e", f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
