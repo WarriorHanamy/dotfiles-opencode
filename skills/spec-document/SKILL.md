@@ -1,7 +1,7 @@
 ---
 name: spec-document-format
 description: |
-    Standard format for spec documents.
+    The format of spec documents.
 ---
 
 ## 📄 Specification Document Format

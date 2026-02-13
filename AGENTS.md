@@ -3,3 +3,4 @@
 - Use **4 spaces** for indent by default.
 - DO NOT use **Unicode hyphen** `‑` (U+2011); Use **ASCII hyphen** `-` (U+002D).
 - Use bash **heredoc** syntax for executing one-liners.
+- Always response in Chinese.
