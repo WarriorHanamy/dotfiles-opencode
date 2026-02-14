@@ -2,6 +2,7 @@
 description: Quick
 mode: primary
 temperature: 0.0
+color: "#4caf50"
 model: zhipuai-coding-plan/glm-4.5-air
 ---
 
