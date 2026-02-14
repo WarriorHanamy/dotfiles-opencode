@@ -241,6 +241,8 @@ ARG HTTPS_PROXY
 ENV HTTP_PROXY=$HTTP_PROXY
 ENV HTTPS_PROXY=$HTTPS_PROXY
 ENV EDITOR=nvim
+ENV OPENCODE_DISABLE_AUTOUPDATE=1
+ENV OPENCODE_ENABLE_EXA=1
 
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list && sed -i s@/security.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
 RUN echo "Acquire::http::Proxy \\"$HTTP_PROXY\\";" >> /etc/apt/apt.conf && echo "Acquire::https::Proxy \\"$HTTPS_PROXY\\";" >> /etc/apt/apt.conf
@@ -266,16 +268,17 @@ RUN apt-get install -y neovim
 RUN apt-get install -y python-is-python3 python3-virtualenv
 RUN apt-get install -y clickhouse-client
 
-RUN npm install -g @franlol/opencode-md-table-formatter@0.0.3
-
 RUN passwd -d ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu-nopasswd && chmod 440 /etc/sudoers.d/ubuntu-nopasswd
 
-ENV OPENCODE_DISABLE_AUTOUPDATE=1
-ENV OPENCODE_ENABLE_EXA=1
-
 USER ubuntu
-RUN mkdir -p /home/ubuntu/.local/share/opencode && mkdir -p /home/ubuntu/.local/state/opencode && mkdir -p /home/ubuntu/.cache/opencode
+RUN curl -fsSL https://opencode.ai/install | bash
+ENV PATH="/home/ubuntu/.opencode/bin:$PATH"
+RUN mkdir -p /home/ubuntu/.config/opencode /home/ubuntu/.local/share/opencode /home/ubuntu/.local/state/opencode /home/ubuntu/.cache/opencode
+RUN npm install -g @franlol/opencode-md-table-formatter@0.0.3
+
+# {{{{{{
 RUN echo {base64.b64encode(GIT_WRAPPER.encode()).decode()} | base64 -d > /home/ubuntu/.opencode/bin/git && chmod +x /home/ubuntu/.opencode/bin/git
+# }}}}}}
 CMD /bin/bash
 """
 
