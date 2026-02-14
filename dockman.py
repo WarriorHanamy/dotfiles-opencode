@@ -248,13 +248,6 @@ RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list &
 RUN echo "Acquire::http::Proxy \\"$HTTP_PROXY\\";" >> /etc/apt/apt.conf && echo "Acquire::https::Proxy \\"$HTTPS_PROXY\\";" >> /etc/apt/apt.conf
 RUN apt-get clean && apt-get update
 RUN apt-get install -y curl
-
-USER ubuntu
-RUN curl -fsSL https://opencode.ai/install | bash
-ENV PATH="/home/ubuntu/.opencode/bin:$PATH"
-RUN mkdir -p /home/ubuntu/.config/opencode
-
-USER root
 RUN apt-get install -y git
 RUN apt-get install -y tmux
 RUN apt-get install -y python3-dev python3-pip
