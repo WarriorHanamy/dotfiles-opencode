@@ -1,5 +1,8 @@
 {
     "$schema": "https://opencode.ai/config.json",
+    "experimental": {
+        "mcp_timeout": 120000
+    },
     "provider": {
         "deepseek": {
             "options": {
@@ -13,7 +16,7 @@
         }
     },
     "theme": "tokyonight",
-    "model": "zhipuai-coding-plan/glm-5",
+    "model": "deepseek/deepseek-reasoner",
     "small_model": "zhipuai-coding-plan/glm-4.5-air",
     "default_agent": "quick",
     "mcp": {
@@ -78,7 +81,9 @@
             "command": [
                 "npx",
                 "-y",
-                "chrome-devtools-mcp@latest"
+                "chrome-devtools-mcp@latest",
+                "--no-usage-statistics",
+                "--headless", "true"
             ],
             "enabled": false
         },

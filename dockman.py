@@ -348,7 +348,7 @@ def cmd_build(args: argparse.Namespace) -> int:
         print(f"  Run `{SCRIPT_NAME} init` to create one", file=sys.stderr)
         return 1
 
-    image_name = f"docker-worker-{dir_name}:latest"
+    image_name = f"docker-worker-{dir_name.lower()}:latest"
 
     build_args = []
     if http_proxy := fix_proxy_for_docker(os.environ.get("http_proxy")):
@@ -372,7 +372,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     """Run docker container."""
     dir_name = get_current_dir_name()
     current_dir = Path.cwd()
-    image_name = f"docker-worker-{dir_name}:latest"
+    image_name = f"docker-worker-{dir_name.lower()}:latest"
 
     # Check if image exists
     result = subprocess.run(
@@ -386,7 +386,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     for line in result.stdout.splitlines():
         try:
             data = json.loads(line)
-            if data.get("Repository") == f"docker-worker-{dir_name}":
+            if data.get("Repository") == f"docker-worker-{dir_name.lower()}":
                 image_exists = True
                 break
         except json.JSONDecodeError:
