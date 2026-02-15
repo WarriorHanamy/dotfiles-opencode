@@ -1,5 +1,5 @@
 ---
-name: neovim-manipulation
+name: neovim-guide
 description: |
     Use when user mentioned neovim.
 ---

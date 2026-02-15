@@ -1,5 +1,5 @@
 ---
-name: using-tmux
+name: tmux-guide
 description: |
     MUST use this skill before starting ANY long tasks run for more than **2 minutes** or run **indefinitely**. Examples: web servers, dataset pipeline, model training.
 ---

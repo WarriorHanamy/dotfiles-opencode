@@ -1,5 +1,5 @@
 ---
-name: spec-document-format
+name: spec-document
 description: |
     The format of spec documents.
 ---

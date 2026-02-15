@@ -429,6 +429,12 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"Using host git config: {gitconfig_path}")
         docker_cmd.extend(["-v", f"{gitconfig_path}:/home/ubuntu/.gitconfig:ro"])
 
+    # Mount git config if exists
+    mistake_path = Path.home() / "MISTAKE.md"
+    if mistake_path.exists():
+        print(f"Using host mistake notebook: {mistake_path}")
+        docker_cmd.extend(["-v", f"{gitconfig_path}:/home/ubuntu/MISTAKE.md"])
+
     # Mount opencode config if exists
     for mount_path, mount_type in OPENCODE_CONFIG_PATHS.items():
         if (host_path := Path.home() / mount_path).exists():
