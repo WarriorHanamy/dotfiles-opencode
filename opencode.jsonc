@@ -15,6 +15,7 @@
     "theme": "tokyonight",
     "model": "zhipuai-coding-plan/glm-5",
     "small_model": "zhipuai-coding-plan/glm-4.5-air",
+    "default_agent": "quick",
     "mcp": {
         "zai-mcp-server": {
             "type": "local",
@@ -95,6 +96,7 @@
     },
     "plugin": [
         "@franlol/opencode-md-table-formatter@0.0.3",
-        "opencode-pty"
+        "opencode-pty",
+        "@mohak34/opencode-notifier@latest"
     ]
 }
