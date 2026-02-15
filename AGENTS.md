@@ -41,7 +41,7 @@ When multiple skills could apply, use this order:
 
 ## Skill Types
 
-- **Rigid** (SDD, debugging): Follow exactly. Don't adapt away discipline.
+- **Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.
 - **Flexible** (patterns): Adapt principles to context.
 
 The skill itself tells you which.
