@@ -4,6 +4,48 @@
         "mcp_timeout": 120000
     },
     "provider": {
+        "n1n": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "N1N.AI",
+            "options": {
+                "baseURL": "https://api.n1n.ai",
+                "apiKey": "{env:N1N_API_KEY}"
+            },
+            "models": {
+                "gpt-4o-mini": { "name": "GPT-4o-mini" },
+                "gpt-4o": { "name": "GPT-4o" },
+                "gpt-5.3-codex": { "name": "GPT-5.3 Codex" },
+                "gpt-5.3-codex-xhigh": { "name": "GPT-5.3 Codex xHigh" },
+                "gpt-5.3-codex-high": { "name": "GPT-5.3 Codex High" },
+                "gpt-5.3-codex-medium": { "name": "GPT-5.3 Codex Medium" },
+                "gpt-5.3-codex-low": { "name": "GPT-5.3 Codex Low" },
+                "gpt-5.2": { "name": "GPT-5.2" },
+                "gpt-5.2-chat": { "name": "GPT-5.2 Chat" },
+                "gpt-5.2-codex": { "name": "GPT-5.2 Codex" },
+                "gpt-5.1": { "name": "GPT-5.1" },
+                "gpt-5.1-chat": { "name": "GPT-5.1 Chat" },
+                "gpt-5.1-codex": { "name": "GPT-5.1 Codex" },
+                "claude-opus-4-6-thinking": { "name": "Claude Opus 4.6 Thinking" },
+                "claude-opus-4-6": { "name": "Claude Opus 4.6" }
+                "claude-sonnet-4-5-20250929-thinking": { "name": "Claude Sonnet 4.5 Thinking" },
+                "claude-sonnet-4-5-20250929": { "name": "Claude Sonnet 4.5" },
+                "claude-haiku-4-5-20251001-thinking": { "name": "Claude Haiku 4.5 Thinking" },
+                "claude-haiku-4-5-20251001": { "name": "Claude Haiku 4.5" },
+                "grok-4.1": { "name": "Grok 4.1" },
+                "gemini-3-pro-preview-thinking": { "name": "Gemini 3 Pro Thinking" },
+                "gemini-3-pro-preview": { "name": "Gemini 3 Pro" },
+                "gemini-3-flash-preview": { "name": "Gemini 3 Flash" },
+                "gemini-2.5-pro-thinking": { "name": "Gemini 2.5 Thinking" },
+                "gemini-2.5-pro": { "name": "Gemini 2.5 Pro" },
+                "deepseek-v3.2-thinking": { "name": "DeepSeek v3.2 Thinking" },
+                "deepseek-v3.2": { "name": "DeepSeek v3.2" },
+                "deepseek-v3.2-fast": { "name": "DeepSeek v3.2 Fast" },
+                "deepseek-v3.1-thinking": { "name": "DeepSeek v3.1 Thinking" },
+                "deepseek-v3.1": { "name": "DeepSeek v3.1" },
+                "deepseek-reasoner": { "name": "DeepSeek Reasoner" },
+                "deepseek-chat": { "name": "DeepSeek Chat" }
+            },
+        },
         "deepseek": {
             "options": {
                 "apiKey": "{env:DEEPSEEK_API_KEY}"
