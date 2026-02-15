@@ -38,36 +38,57 @@ Universal Mistake Notebook `~/MISTAKE.md`:
 
 When encounter a severe problem:
 
-- Look for solution in `MISTAKE.md` and `~/MISTAKE.md`.
+- Look for solution in both `MISTAKE.md` and `~/MISTAKE.md`.
+- If found:
+    - Try fix the problem using the solution found in Mistake Notebook.
+    - If problem fixed:
+        - Done.
+    - If problem persists:
+        - Figure out why the existing solution in Mistake Notebook didn't work.
+        - If the problem solved:
+            - Goto 'Trigger 2: Severe Problem Fixed'
 - If not found:
     - Work out the problem on ourselves.
-    - Goto 'Memorizing Problem Solutions'
+    - If the problem solved:
+        - Goto 'Trigger 2: Severe Problem Fixed'
 
 ### Trigger 2: Severe Problem Fixed
 
-After you fixed a severe mistake with a clear solution valuable to be recorded
+After you fixed a severe mistake:
+
+- If the problem is solved with a **clear solution** that is **valuable to be recorded**:
+    - Goto 'Memorizing Problem Solutions'.
 
 ### Trigger 3: User Ask for Memorizing Mistake
 
 When user requested 'Do not make this mistake again':
 
-- Make sure the problem is solved as user intented.
-- Goto 'Memorizing Problem Solutions'.
+- If the problem not solved yet according to conversation context:
+    - Work on solve the problem first.
+    - If the problem is solved:
+        - Report user for your discovery.
+        - Goto 'Memorizing Problem Solutions'.
+- If the problem is solved as user intented:
+    - Goto 'Memorizing Problem Solutions'.
 
 ## Memorizing Problem Solutions
 
 - If a problem is solved with a clear solution:
-    - If this mistake is not recorded yet in both `MISTAKE.md` and `~/MISTAKE.md`:
-        - If the problem is related to this project:
-            - Choose `MISTAKE.md`.
-        - If the problem is generic and universal:
-            - Choose `~/MISTAKE.md`.
-        - Append soltuion to the choosen Mistake Notebook according to 'Mistake Solution Format'.
-        - Make a brief report to the user about:
-            - The mistake you made.
-            - What you learnt from this mistake.
-            - What is the solution to the problem.
-            - Which file the solution was memorized.
+    - Check if this problem is already recorded in `MISTAKE.md` and `~/MISTAKE.md`:
+        - Already recorded:
+            - If the recorded solution is not working or out-of-date:
+                - Update the recorded solution according to 'Mistake Solution Format'.
+        - Not recorded yet:
+            - If the problem is related to this project:
+                - Choose `MISTAKE.md`.
+            - If the problem is generic and universal:
+                - Choose `~/MISTAKE.md`.
+            - Append soltuion to the choosen Mistake Notebook according to 'Mistake Solution Format'.
+            - Make a brief report in response for:
+                - The mistake you made.
+                - What you learnt from this mistake.
+                - What is the solution to the problem.
+                - Report that you have updated the Mistake Notebook.
 
 ## Mistake Solution Format
 
@@ -97,9 +118,9 @@ Below is a list of mistakes I previously made and solved:
 
 ### Insights:
 
-[record your insights when solving this problem:]
+[list your insights and discoveries when solving this problem:]
 - This is because XXX lacks AAA.
-- YYY requires BBB for CCC.
+- I found that YYY depends on BBB for CCC.
 - ...
 
 ### Solution:
@@ -113,5 +134,8 @@ Below is a list of mistakes I previously made and solved:
 - And XXX fixed.
 ```
 
+## Edge Cases
+
 - If Mistake Notebook not exist, create one.
 - If Mistake Notebook exist, append to it.
+- If writting into Mistake Notebook failed due to permission issues, report by outputing response in the 'Mistake' format.
