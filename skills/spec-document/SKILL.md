@@ -51,6 +51,6 @@ When writting specification document:
 - Include **edge cases** in test steps when appliable.
 - DO NOT hallucinate.
 
-### Example Spec Document
+### 💡 Example Spec Document
 
 Read @memo-app-spec-example.md as a good example of a complete spec document.

@@ -247,7 +247,14 @@
     "permission": {
         "external_directory": {
             "*": "ask",
-            "/tmp*": "allow",
+            "~/.config/opencode/skills/*": "allow",
+            "/tmp/*": "allow",
+        }
+    },
+    "formatter": {
+        "stylua": {
+            "command": ["stylua", "-", "$FILE"],
+            "extensions": [".lua"]
         }
     },
     "plugin": [
