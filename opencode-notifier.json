@@ -1,29 +1,19 @@
 {
   "sound": false,
-  "notification": true,
+  "notification": false,
   "timeout": 2,
   "showProjectName": true,
-  "events": {
-    "permission": {
-      "sound": false,
-      "notification": true
-    },
-    "complete": {
-      "sound": false,
-      "notification": true
-    },
-    "error": {
-      "sound": false,
-      "notification": true
-    },
-    "question": {
-      "sound": false,
-      "notification": true
-    }
+  "notificationSystem": "osascript",
+  "command": {
+      "enabled": true,
+      "path": "/usr/bin/bash",
+      "args": ["-c", "test {message} != subagent_complete && dunstify -u low -a opencode $PWD {message}"],
+      "minDuration": 1
   },
   "messages": {
     "permission": "Action required",
     "complete": "Done!",
+    "subagent_complete": "Subagent complete",
     "error": "Something went wrong",
     "question": "Input needed"
   }
