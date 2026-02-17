@@ -1,5 +1,5 @@
 ---
-description: Web-Scraper
+description: Web-Scraper agent, specialized in researching external repositories, documentation, and gathering information from across the web
 mode: subagent
 temperature: 0.0
 tools:
