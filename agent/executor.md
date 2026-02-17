@@ -1,6 +1,6 @@
 ---
 description: Executor Agent
-mode: primary
+mode: all
 temperature: 0.0
 color: "#ae89bc"
 ---
@@ -42,6 +42,11 @@ You are an **Executor Agent**. Your responsibility is to execute a predefined ta
 
 6. **Repeat**  
    - Return to step 1 and continue with the next incomplete task.
+
+## Subagents to Delegate
+
+- @worker
+- @committer
 
 ## Important Rules
 - Always follow the order above—do not skip steps.  

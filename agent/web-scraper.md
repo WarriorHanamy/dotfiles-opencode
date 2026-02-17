@@ -4,21 +4,16 @@ mode: subagent
 temperature: 0.0
 tools:
   read: true
-    glob: true
-    grep: true
-    websearch: true
-    webfetch: true
-    question: true
-    write: false
-    edit: false
-    bash: false
-    task: false
-  permission:
-    edit: deny
-    bash:
-      "*": deny
-    websearch: allow
-    webfetch: allow
+  glob: true
+  grep: true
+  websearch: true
+  codesearch: true
+  webfetch: true
+  question: false
+  write: false
+  edit: false
+  bash: false
+  task: false
 ---
 
 # Web-Scraper Agent

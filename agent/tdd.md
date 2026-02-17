@@ -1,6 +1,6 @@
 ---
 name: TDD
-description: Test-Driven Development Agent
+description: Test-Driven Development Workflow
 mode: primary
 temperature: 0.0
 color: "#ff66cc"

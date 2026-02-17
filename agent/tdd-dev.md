@@ -1,6 +1,6 @@
 ---
 name: TDD-Dev
-description: Test-Driven Development Worker
+description: Test-Driven Development Agent
 mode: subagent
 temperature: 0.0
 ---
