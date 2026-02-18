@@ -260,6 +260,8 @@ RUN apt-get update
 RUN apt-get install -y neovim
 RUN apt-get install -y python-is-python3 python3-virtualenv
 RUN apt-get install -y clickhouse-client
+RUN apt-get install -y jq
+RUN apt-get install -y redis
 
 RUN passwd -d ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu-nopasswd && chmod 440 /etc/sudoers.d/ubuntu-nopasswd
 
@@ -649,6 +651,32 @@ def cmd_run(args: argparse.Namespace) -> int:
     return result.returncode
 
 
+def cmd_rm(args: argparse.Namespace) -> int:
+    """Remove reuse container."""
+    dir_name = get_current_dir_name()
+    container_name = f"dockman-{dir_name.lower()}"
+    status = get_container_status(container_name)
+
+    if status == "nonexistent":
+        print(f"✗ Container not found: {container_name}", file=sys.stderr)
+        return 1
+
+    if status == "running" and not args.force:
+        print(f"✗ Container {container_name} is running", file=sys.stderr)
+        print(f"  Use --force to stop and remove", file=sys.stderr)
+        return 1
+
+    cmd = ["sudo", "-g", "docker", "docker", "rm"]
+    if args.force:
+        cmd.append("-f")
+    cmd.append(container_name)
+
+    result = execute(cmd, dry_run=args.dry_run)
+    if result.returncode == 0 and not args.dry_run:
+        print(f"Removed container: {container_name}", file=sys.stderr)
+    return result.returncode
+
+
 def cmd_version(args: argparse.Namespace) -> int:
     """Show version."""
     print(f"{SCRIPT_NAME} version {SCRIPT_VERSION}")
@@ -704,9 +732,19 @@ def main() -> int:
         "--no-interactive", action="store_true", help="Run in non-interactive mode"
     )
     run_parser.add_argument(
-        "-r", "--reuse",
+        "-r",
+        "--reuse",
         action="store_true",
         help="Reuse existing container instead of creating new one",
+    )
+
+    # rm command
+    rm_parser = subparsers.add_parser("rm", help="Remove reuse container")
+    rm_parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force remove running container",
     )
 
     # version command
@@ -724,6 +762,8 @@ def main() -> int:
         return cmd_build(args)
     elif args.command == "run":
         return cmd_run(args)
+    elif args.command == "rm":
+        return cmd_rm(args)
     elif args.command == "version":
         return cmd_version(args)
 

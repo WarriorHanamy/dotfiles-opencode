@@ -50,6 +50,7 @@ When begining working on a task: List all skills you have, use any relevant skil
 
 - Use setup-fresh-project skill if in a fresh project.
 - Use test-driven-development skill if TDD is appliable.
+- Use testing-safe-protocol skill before running tests.
 - Use mistake-notebook to memorize mistakes and look for historical mistake solution.
 - Use systematic-debugging when debugging.
 - Use verification-before-completion before claiming completion.
@@ -66,6 +67,10 @@ For example:
 - GUI: Use **screenshot tools** and **vision capbility** to view user interface.
 
 > Install requirements freely if tools are missing, no need for asking user confirmation.
+
+Real-world I/O mocking:
+- TDD: **Mock** all the dependencies (database, file I/O), no global side-effect.
+- Wrapper Script: Provide a **dry-run** option for testing control flow first.
 
 This avoids asking human for interaction, save the human user from being constantly annoyed by the worker agent.
 
