@@ -186,6 +186,11 @@ The `description` and `steps` fields serve distinct purposes:
 - Enables Executor to decide whether to pass `steps` to Worker or use high-level `description` only
 - Clarifies that `steps` are *recommended* guidance, not strict requirements
 - Maintains clarity for LLM parsing and prompt engineering
+- Allows Worker to deviate from steps if a more efficient approach meets all acceptance-criteria
+
+**Key Rule: Acceptance-criteria always take priority over steps**
+- If following the steps exactly would miss an acceptance criterion, the Worker should adapt the approach
+- The `description` + `acceptance-criteria` define the WHAT; `steps` suggest HOW (but not exclusively)
 
 ## Validation Checklist Before Writing tasks.json
 
@@ -226,6 +231,35 @@ After writing `tasks.json`, perform the following validation:
 - The `skills` array lists relevant skills from the Worker agent (can be empty `[]` if none apply).
 - The `steps` array can be empty `[]` for atomic tasks, or contain 2-15 items for complex tasks.
 - Ensure the JSON is valid, parseable, and conforms to all field specifications above.
+
+## Edge Cases & Error Handling
+
+### Multiline description
+If a `description` spans multiple lines or contains multiple sentences:
+- Remove all newline characters (`\n`)
+- Combine sentences into a single imperative statement
+- If unable to meaningfully combine, split the task into multiple smaller tasks
+- Example:
+  - ❌ "Create database. Configure schema. Add auth."
+  - ✅ "Create and configure PostgreSQL database with authentication schema."
+
+### Empty steps array
+- Use empty array `[]` if the task is atomic and requires no substeps
+- This signals to the Executor and Worker that the task needs no step-by-step guidance
+- Example: Simple atomic task like "Update package version in package.json"
+
+### Ambiguous acceptance-criteria
+- Each criterion MUST be independently verifiable
+- If one criterion depends on or references another, restructure both into standalone conditions
+- Example:
+  - ❌ "Form validates email (as per step 2) and handles errors appropriately"
+  - ✅ "Form validates email format using regex. Form displays specific error messages for invalid input."
+
+### Step descriptions that are too broad
+- If a step.description covers multiple distinct actions, break it into separate steps
+- Example:
+  - ❌ `{"step": 1, "description": "Create database schema with users table, add indexes, and set up foreign keys"}`
+  - ✅ Split into three steps: Create schema, Add indexes, Set up foreign keys
 
 ## Important Guidelines
 - Never execute the tasks yourself. Your job ends when you output the JSON.
