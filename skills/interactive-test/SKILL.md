@@ -33,7 +33,7 @@ Heres are the common solutions:
 
 - Traditional local GUI (e.g. Qt, Pygame):
     - If the project offers standard unit tests for non-interactive functionalities, run that first.
-    - For intergration test:
+    - For e2e test with GUI running:
         - Must ask human user for manual test.
 
 ## Testing TUI Applications
