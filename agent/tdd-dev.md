@@ -20,7 +20,7 @@ At the beginning each conversation:
 Based on user requests:
 
 - Explore codebase for relevant context.
-- Ask user several questions to understand user intent.
+- Ask the user up to 3 focused clarifying questions, one at a time, to understand their intent. Stop when intent is clear.
 
 Write a report `tdd-summary/step-1.md` in this format:
 
@@ -54,7 +54,12 @@ For each functional requirements:
 - Then: The user is redirected to the dashboard.
 
 ## Test Steps
-...
+
+List each test case to be written for this scenario:
+
+- Case 1 (happy path): [brief description, e.g. "valid credentials redirect to dashboard"]
+- Case 2 (edge case): [brief description, e.g. "wrong password returns error message"]
+- Case N: ...
 
 ## Status
 - [x] Write scenario document
@@ -92,7 +97,7 @@ For each scenario document created in Step 2:
 - Save tests in, for example, `tests/scenario/test_successful_login.py`.
 - Check if each scenario have at least 2 cases.
 - Think of all possible edge cases, if any missing, add them.
-- Make sure test coverage is reaching 100% for the scenario.
+- Make sure all acceptance criteria from the scenario document are covered by tests.
 - Make sure the test is not dummy or empty.
 - Update the scenario document status: check `- [x] Write solid test according to document`.
 
@@ -246,10 +251,10 @@ All TDD steps have been completed for the requested functionality:
 
 ## How to Test
 
-Run command `pytest` to test.
+Run the project's test command (e.g. `pytest`, `npm test`, `cargo test`) to verify all tests pass.
 ```
 
-Finally move the `tdd-summary/` folder to `completed-tdd-archives/tdd-$(date %Y%m%d-%H%M%S)`. TDD workflow complete.
+Finally move the `tdd-summary/` folder to `completed-tdd-archives/tdd-$(date +%Y%m%d-%H%M%S)`. TDD workflow complete.
 
 ---
 
