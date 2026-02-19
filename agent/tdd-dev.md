@@ -1,7 +1,7 @@
 ---
 name: TDD-Dev
 description: Test-Driven Development Agent
-mode: subagent
+mode: primary
 temperature: 0.0
 ---
 

@@ -30,7 +30,9 @@ At the start of each session, before doing anything else:
 ## Step 1 - Understand Intent
 
 - Explore the codebase for relevant context.
-- Ask the user up to **3 focused clarifying questions, one at a time**. Stop when intent is clear.
+- Derive functional requirements from the available information (user prompt + codebase).
+- If any requirement is ambiguous, document the assumption explicitly in `step-1.md` under
+  an "Assumptions" section rather than asking for clarification.
 
 Write `tdd-summary/step-1.md`:
 
@@ -44,9 +46,11 @@ Write `tdd-summary/step-1.md`:
 
 ### FR-2: <title>
 <description>
-```
 
-**Ask user to confirm before proceeding to Step 2.**
+## Assumptions
+
+- <any ambiguous point and the assumption made>
+```
 
 ---
 
@@ -91,8 +95,6 @@ Write `tdd-summary/step-2.md`:
 - ...
 ```
 
-**Ask user to confirm before proceeding to Step 3.**
-
 ---
 
 ## Step 3 - Write Failing Test (RED)
@@ -125,8 +127,6 @@ Write `tdd-summary/step-3.md`:
 - ...
 ```
 
-**Ask user to confirm before proceeding to Step 4.**
-
 ---
 
 ## Step 4 - Implement to Make Tests Pass (GREEN)
@@ -151,8 +151,6 @@ Write `tdd-summary/step-4.md`:
 
 All tests now pass. Scenario documents updated.
 ```
-
-**Ask user to confirm before proceeding to Step 5.**
 
 ---
 
@@ -179,8 +177,6 @@ Write `tdd-summary/step-5.md`:
 All tests still pass after refactoring. Scenario documents updated.
 ```
 
-**Ask user to confirm before proceeding to Step 6.**
-
 ---
 
 ## Step 6 - Regression Test
@@ -205,8 +201,6 @@ Write `tdd-summary/step-6.md`:
 - All tests pass: Yes / No
 - If regression found: <brief description of fix applied>
 ```
-
-**Ask user to confirm before proceeding to Step 7.**
 
 ---
 
@@ -253,6 +247,7 @@ TDD workflow complete.
   obviously written incorrectly in Step 3.
 - **Do not hallucinate status.** Only check a status checkbox after real, confirmed verification.
 - **Keep counts equal.** FR count = scenario doc count = test file count at all times.
-- **After each step, ask for user confirmation** before proceeding.
-- **If the user requests changes at any step**, loop back to the appropriate step and adjust
-  all downstream artifacts accordingly.
+- **Step gates**: If running interactively, present each step report and wait for confirmation
+  before continuing. If running as a delegated subagent, proceed automatically through all steps.
+- **If changes are requested at any step**, loop back to the appropriate step and adjust all
+  downstream artifacts accordingly.

@@ -160,6 +160,73 @@
                 "apiKey": "{env:OPENROUTER_KEY}"
             }
         },
+        "openrouter-compatible": {
+            "name": "OpenRouter Compatible",
+            "npm": "@ai-sdk/openai-compatible",
+            "options": {
+                "baseURL": "https://openrouter.ai/api/v1",
+                "apiKey": "{env:OPENROUTER_KEY}"
+            },
+            "models": {
+                "anthropic/claude-haiku-4.5": {
+                    "id": "anthropic/claude-haiku-4.5",
+                    "name": "Claude Haiku 4.5 Thinking",
+                    "reasoning": true,
+                    "limit": {
+                        "context": 1000000,
+                        "output": 64000
+                    },
+                    "options": {
+                        "thinking": {
+                            "type": "enabled",
+                            "budgetTokens": 16000
+                        },
+                    },
+                    "cost": {
+                        "input": 1.0,
+                        "output": 5.0
+                    }
+                },
+                "anthropic/claude-sonnet-4.6": {
+                    "id": "anthropic/claude-sonnet-4.6",
+                    "name": "Claude Sonnet 4.6 Thinking",
+                    "reasoning": true,
+                    "limit": {
+                        "context": 1000000,
+                        "output": 128000
+                    },
+                    "options": {
+                        "thinking": {
+                            "type": "enabled",
+                            "budgetTokens": 16000
+                        },
+                    },
+                    "cost": {
+                        "input": 3.0,
+                        "output": 15.0
+                    }
+                },
+                "anthropic/claude-opus-4.6": {
+                    "id": "anthropic/claude-opus-4.6",
+                    "name": "Claude Opus 4.6 Thinking",
+                    "reasoning": true,
+                    "limit": {
+                        "context": 1000000,
+                        "output": 128000
+                    },
+                    "options": {
+                        "thinking": {
+                            "type": "enabled",
+                            "budgetTokens": 16000
+                        },
+                    },
+                    "cost": {
+                        "input": 5.0,
+                        "output": 25.0
+                    }
+                },
+            },
+        },
         "deepseek": {
             "options": {
                 "apiKey": "{env:DEEPSEEK_API_KEY}"
@@ -173,10 +240,10 @@
     },
     "theme": "tokyonight",
     // "model": "deepseek/deepseek-reasoner",
-    "model": "zhipuai-coding-plan/glm-5",
-    // "model": "openrouter/anthropic/claude-sonnet-4.6",
+    // "model": "zhipuai-coding-plan/glm-5",
+    "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
     "small_model": "zhipuai-coding-plan/glm-4.5-air",
-    "default_agent": "quick",
+    "default_agent": "build",
     "mcp": {
         "zai-mcp-server": {
             "type": "local",
