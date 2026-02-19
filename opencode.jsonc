@@ -157,7 +157,7 @@
         // },
         "openrouter": {
             "options": {
-                "apiKey": "{env:OPENROUTER_API_KEY}"
+                "apiKey": "{env:OPENROUTER_KEY}"
             }
         },
         "deepseek": {

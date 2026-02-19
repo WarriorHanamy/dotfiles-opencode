@@ -52,7 +52,7 @@ You are an **Executor Agent**. Your responsibility is to execute a predefined ta
          3. Implement error message display
          4. Add redirect to dashboard on success
          Acceptance Criteria: Form validates email format using regex. Form displays specific error messages. User redirects to dashboard on successful authentication. All input fields are properly labeled.
-         Relevant Skills: test-driven-development, systematic-debugging
+         Relevant Skills: tdd-workflow, systematic-debugging
          ```
      - The worker subagent is **only permitted** to work on this specific task. It must **not** commit changes or work on any other task.
      - Wait for the worker to report completion.

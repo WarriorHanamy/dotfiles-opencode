@@ -33,7 +33,7 @@ Steps:
 3. Implement error message display
 4. Add redirect to dashboard on success
 Acceptance Criteria: Form validates email format using regex. Form displays specific error messages. User redirects to dashboard on successful authentication.
-Relevant Skills: test-driven-development, systematic-debugging
+Relevant Skills: tdd-workflow, systematic-debugging
 ```
 
 ### How to Parse Your Task Briefing
@@ -81,7 +81,7 @@ Relevant Skills: test-driven-development, systematic-debugging
 6. **Write clean, maintainable code** following the project's apparent patterns and conventions.
 
 7. **Verify your changes** meet all acceptance criteria by:
-   - Running automated tests if applicable (especially important if `test-driven-development` skill is listed)
+   - Running automated tests if applicable (especially important if `tdd-workflow` skill is listed)
    - Manually testing critical workflows
    - Checking against each acceptance criterion explicitly
    - Using `verification-before-completion` skill if listed
@@ -241,7 +241,7 @@ Before starting work, review these available skills and apply any that are relev
 
 - **setup-fresh-project**: Use if working in a new project
 - **installing-dependencies**: Use when installing any dependency, package, or tool
-- **test-driven-development**: Use if TDD is applicable
+- **tdd-workflow**: Use if TDD is applicable
 - **testing-safe-protocol**: Use before running tests
 - **mistake-notebook**: Use to learn from historical problems and avoid repeating mistakes
 - **systematic-debugging**: Use when encountering bugs or unexpected behavior

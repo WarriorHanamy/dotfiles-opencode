@@ -174,7 +174,7 @@ When beginning a conversation: Review all available skills and use any that are 
 
 - Use **setup-fresh-project** skill if starting a fresh project.
 - Use **installing-dependencies** skill when installing any dependency, package, or tool.
-- Use **test-driven-development** skill if TDD is applicable.
+- Use **tdd-workflow** skill if TDD is applicable.
 - Use **mistake-notebook** skill to learn from historical problems.
 
 When writing task list, think if each task requires any skills. Add relevant skills to the `skills` array in each task object. For example:
@@ -183,7 +183,7 @@ When writing task list, think if each task requires any skills. Add relevant ski
   "task": "Set up authentication",
   "description": "...",
   "acceptance-criteria": "...",
-  "skills": ["test-driven-development", "systematic-debugging"],
+  "skills": ["tdd-workflow", "systematic-debugging"],
   "complete": false
 }
 ```
@@ -333,15 +333,15 @@ Each task object MUST conform to these strict rules:
 - **Valid values**: Only predefined OpenCode skills (see Worker agent documentation)
 - **Constraint**: No duplicates, only include skills directly applicable to this task
 - **Common skill values**:
-  - `test-driven-development` (when TDD is applicable)
+  - `tdd-workflow` (when TDD is applicable)
   - `systematic-debugging` (when debugging is expected)
   - `setup-fresh-project` (for new project initialization)
   - `installing-dependencies` (when installing any dependency, package, or tool)
   - `verification-before-completion` (for critical verification needs)
-- **Valid Example**: `["test-driven-development", "systematic-debugging"]`
+- **Valid Example**: `["tdd-workflow", "systematic-debugging"]`
 - **Invalid Examples** (❌):
   - `["tdd", "debugging"]` (non-standard names)
-  - `["test-driven-development", "test-driven-development"]` (duplicates)
+  - `["tdd-workflow", "tdd-workflow"]` (duplicates)
 
 ### `complete` Field
 - **Type**: Boolean
@@ -394,7 +394,7 @@ For each task object:
 ☐ test-plan.integration: Empty [] for foundation tasks with no dependencies
 ☐ test-plan.e2e-manual: Only contains items requiring human perceptual judgment
 ☐ test-plan shift-left: No item exists in integration/e2e-manual that could be a unit test
-☐ test-plan consistency: Tasks with skills ["test-driven-development"] have non-empty unit array
+☐ test-plan consistency: Tasks with skills ["tdd-workflow"] have non-empty unit array
 ☐ acceptance-criteria field: Contains at least 1 measurable condition
 ☐ acceptance-criteria field: Uses clear modal verbs (must, should, can)
 ☐ acceptance-criteria field: No vague language (works, is correct, properly, etc.)

@@ -47,7 +47,7 @@ A **Feasibility Report** in Markdown format containing:
    - Assess dependencies, compatibility with existing stack, performance requirements, security implications.
    - Note prerequisites/costs for assumed infrastructure or third‑party services.
 6. **TDD feasibility assessment** (if spec mentions TDD):
-   - Use the test-driven-development skill.
+   - Use the tdd-workflow skill.
    - For each **Functional Requirement (FR‑X)**:
      - **Testability**: Can it be tested automatically? (✅ Yes / ⚠️ Conditional / ❌ No)
      - **Mockability**: If it depends on external I/O (DB, API, filesystem), can those be mocked? (✅ Yes / ⚠️ Partial / ❌ No)
