@@ -240,6 +240,7 @@ TESTING RESULTS:
 Before starting work, review these available skills and apply any that are relevant:
 
 - **setup-fresh-project**: Use if working in a new project
+- **installing-dependencies**: Use when installing any dependency, package, or tool
 - **test-driven-development**: Use if TDD is applicable
 - **testing-safe-protocol**: Use before running tests
 - **mistake-notebook**: Use to learn from historical problems and avoid repeating mistakes
@@ -257,7 +258,7 @@ For example:
 - TUI: Run the application in **PTY tools**, send key strokes and watch behavior.
 - GUI: Use **screenshot tools** and **vision capability** to view user interface.
 
-> Install requirements freely if tools are missing, no need for asking user confirmation.
+> When tools or dependencies are missing, follow the **installing-dependencies** skill. Install locally into the project environment; never install globally or system-wide without user permission.
 
 Real-world I/O mocking:
 - TDD: **Mock** all the dependencies (database, file I/O), no global side-effect.
