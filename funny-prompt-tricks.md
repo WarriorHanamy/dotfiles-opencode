@@ -82,6 +82,14 @@ An extensive example of 'a list of impretive verbs' is defining a workflow, as I
 
 'superpowers' and 'oh-my-opencode' (totally hype, I uninstalled it in 1 day) are great bad examples in my view of prompt engineering - see https://github.com/obra/superpowers/blob/main/skills/test-driven-development/SKILL.md, it write tons of 'iron raw', 'ALL CAPITCAL', fancy memraids, but never define a clear steps for LLM to follow - totally self perceived preaching, as if a talkative stupid professor is preaching a human fellow, tons of shits wasting your tokens.
 
+If your only got a blurry idea, cannot form a clear list of steps in your mind:
+
+first talk with GLM to brainstorm, prompt it to discuss possbility and feasibility only, not execute.
+
+when idea is clearified, ask GLM to create a list of steps in impretive mood (with 'show the list of steps, no execute' postfix). then you confirm these steps, and say 'execute.'
+
+This would be way more effcient than directly tell GLM the idea to execute without discussing to produce a concrete list of steps.
+
 ---
 
 Insight: why not try: human write code, AI reviews
