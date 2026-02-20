@@ -1,9 +1,7 @@
 ---
 name: tdd-workflow
 description: |
-    Use when implementing new features or fixing bugs. Enforces a strict 7-step
-    Test-Driven Development cycle: understand intent, write scenario docs, write
-    failing tests, implement, refactor, regression test, and final review.
+    Use when implementing new features or fixing bugs. Following a strict Test-Driven Development workflow.
 ---
 
 # TDD Workflow

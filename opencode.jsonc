@@ -21,6 +21,21 @@
                     },
                     "name": "qwen3:8b"
                 },
+                "qwen2.5-coder:14b": {
+                    "attachment": true,
+                    "reasoning": true,
+                    "temperature": true,
+                    "tool_call": true,
+                    "options": {
+                        "temperature": 0.2,
+                        "num_ctx": 8192
+                    },
+                    "limit": {
+                        "context": 8192,
+                        "output": 4096
+                    },
+                    "name": "qwen2.5-coder:14b"
+                },
                 "qwen3-coder": {
                     "attachment": true,
                     "reasoning": true,
