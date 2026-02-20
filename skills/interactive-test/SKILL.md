@@ -28,13 +28,19 @@ Heres are the common solutions:
     - If the project offers standard non-interactive test suite (e.g. `vite test`), run that first.
     - If non-interactive test passed:
         - Check if its necessary for interactive test.
-        - Use `playwright` and/or `chrome-dev-tools` (if available) for headless interactive test.
-        - Capture screenshot using `playwright` and/or `chrome-dev-tools` (save in `/tmp`), then read saved image for vision analysis (if the agent have vision capbility).
+        - Use browser automation tools for headless interactive test.
+        - Capture screenshot using browser automation tools (save in `/tmp`), then read saved image for vision analysis (if the agent have vision capbility).
 
 - Traditional local GUI (e.g. Qt, Pygame):
     - If the project offers standard unit tests for non-interactive functionalities, run that first.
     - For e2e test with GUI running:
         - Must ask human user for manual test.
+
+### Browser Automation Tools
+
+- `playwright`
+- `chrome-dev-tools`
+- `agent-browser`
 
 ## Testing TUI Applications
 

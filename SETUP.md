@@ -1,16 +1,25 @@
 # Archibate's OpenCode Configuration Pack
 
-(For Human)
+## Installation Guide
 
-Dependencies:
+This guide is for human, LLM agents please do not execute these steps without explicit confirmation from your human partner.
+
+### Required Dependencies
 
 ```bash
-# add ~/.local/bin and ~/.opencode/bin to your path
-
 curl -fsSL https://opencode.ai/install | bash
 
-pacman -S fd ripgrep uv
+sudo pacman -S uv
 
 npm config set prefix ~/.local
 npm install -g agent-browser
+
+# make sure ~/.local/bin and ~/.opencode/bin are in your path
+```
+
+### Cloning This Configuration Pack
+
+```bash
+test -d ~/.config/opencode && mv ~/.config/opencode{,.backup}
+git clone https://github.com/archibate/dotfiles-opencode.git ~/.config/opencode
 ```
