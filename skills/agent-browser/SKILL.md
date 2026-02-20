@@ -3,146 +3,206 @@ name: agent-browser
 description: Use this skill for browser automation.
 ---
 
-# Browser Automation with agent-browser
-## HOW IT WORKS
-agent-browser maintains its own browser session with cookies.
-- Login once → cookies saved → stay authenticated for future navigations
-- **WARNING: `agent-browser close` DELETES ALL COOKIES** - you will need to re-login!
-- To keep authentication: NEVER close the session, just navigate to new URLs
-## WORKFLOW
-### 1. Open Browser (MUST use this pattern)
+# agent-browser
+
+A CLI tool for browser automation. It maintains a persistent browser session with cookies - login once and stay authenticated across all subsequent navigations.
+
+## Prerequisites
+
+If `agent-browser` is not installed, it is a system-level CLI tool. Load the `installing-dependencies` skill, inform the user what needs to be installed and where it writes, and wait for explicit permission before proceeding.
+
+## Session
+
+agent-browser keeps a single browser session. Cookies persist across `open` calls as long as the session is alive.
+
 ```bash
-# ALWAYS use this on first open - sets viewport to 1920x1080:
-agent-browser close && agent-browser open <url> --headed && agent-browser set viewport 1920 1080
-# If browser already running, just navigate:
-agent-browser open <url> --headed
+agent-browser session --json                   # Show current session name
+agent-browser session list --json              # List all active sessions
 ```
-### 2. Handle Cookie Banner (MUST DO on public sites)
-After opening a page, ALWAYS:
-1. Run `agent-browser snapshot -i` to check for cookie consent banner
-2. If cookie banner present: click "Accept" / "Accetta" / "Accept all" button
-3. Unless user explicitly asks to keep it open (for development/debugging)
+
+### Opening a browser
+
 ```bash
-agent-browser snapshot -i                     # Look for cookie banner
-agent-browser click @eX                       # Click accept button (use correct @ref)
+# First open: reset any stale state, then set a consistent viewport
+agent-browser close && agent-browser open https://example.com --headed
+agent-browser set viewport 1920 1080
+
+# Subsequent navigations: just open, cookies are preserved
+agent-browser open https://example.com/dashboard --headed
 ```
-### 3. Analyze Page
+
+### Browser settings
+
 ```bash
-agent-browser snapshot -i                     # Get interactive elements with @refs
-agent-browser snapshot -i -c                  # Compact output
+agent-browser set viewport 1920 1080                         # Viewport size
+agent-browser set media dark                                 # Dark mode
+agent-browser set media light                                # Light mode
+agent-browser set headers '{"Accept-Language": "en-US"}'    # Request headers
 ```
-### 4. Interact (use @refs from snapshot)
+
+### Closing the session
+
+`close` destroys the session and deletes all cookies. Only use it when you want a completely fresh start or are fully done with the task. After closing, any authenticated site will require re-login.
+
 ```bash
-agent-browser click @e1                       # Click element
-agent-browser fill @e2 "text"                 # Clear and fill input
-agent-browser type @e2 "text"                 # Type without clearing
-agent-browser press Enter                     # Press key
-agent-browser select @e1 "value"              # Select dropdown
-agent-browser scroll down 500                 # Scroll page
-agent-browser hover @e1                       # Hover element
-agent-browser check @e1                       # Check checkbox
+agent-browser close
 ```
-### 5. Get Information
+
+## Snapshot
+
+Snapshot returns the current page's interactive elements, each assigned a reference handle (`@e1`, `@e2`, ...). Always take a fresh snapshot before interacting, and re-snapshot whenever the page content changes (navigation, modal open/close, AJAX update).
+
 ```bash
-agent-browser get text @e1                    # Element text
-agent-browser get value @e1                   # Input value
-agent-browser get html @e1                    # Element HTML
-agent-browser get attr data-id @e1            # Element attribute
-agent-browser get title                       # Page title
-agent-browser get url                         # Current URL
-agent-browser get box @e1                     # Element bounding box
+agent-browser snapshot -i --json               # Get interactive elements with @refs
 ```
-### 6. Navigate
+
+## Interaction
+
+All interaction commands use `@ref` handles from the most recent snapshot.
+
 ```bash
-agent-browser open <url>                      # Go to URL (keeps cookies!)
-agent-browser back                            # Go back
-agent-browser forward                         # Go forward
-agent-browser reload                          # Reload page
+agent-browser click @e1                        # Click element
+agent-browser fill @e2 "text"                  # Clear field and fill with text
+agent-browser type @e2 "text"                  # Type into field without clearing first
+agent-browser press Enter                      # Press a keyboard key
+agent-browser select @e3 "option-value"        # Select a dropdown option
+agent-browser check @e4                        # Check a checkbox
+agent-browser hover @e5                        # Hover over element
+agent-browser scroll down 500                  # Scroll page by pixels
 ```
-### 7. Wait
+
+### Cookie banners
+
+After opening any public-facing page, check for a cookie consent banner and dismiss it before proceeding - unless the user explicitly asks to leave it for debugging.
+
 ```bash
-agent-browser wait @e1                        # Wait for element
-agent-browser wait 2000                       # Wait milliseconds
-agent-browser wait --text "Success"           # Wait for text
+agent-browser snapshot -i --json               # Check if cookie banner is present
+agent-browser click @eX                        # Click "Accept" / "Accept all" (use correct @ref)
 ```
-### 8. Screenshots
+
+## Navigation
+
+```bash
+agent-browser open https://example.com         # Navigate to URL (session and cookies preserved)
+agent-browser back                             # Go back in history
+agent-browser forward                          # Go forward in history
+agent-browser reload                           # Reload current page
+```
+
+## Waiting
+
+```bash
+agent-browser wait @e1                         # Wait until element exists in DOM
+agent-browser wait 2000                        # Wait fixed milliseconds (use sparingly)
+agent-browser wait --text "Success"            # Wait until text appears on page
+```
+
+Prefer `wait @ref` or `wait --text` over a fixed-time wait - they resolve as soon as the condition is met and fail fast if it never arrives.
+
+## Extracting Data
+
+```bash
+agent-browser get text @e1 --json             # Text content of element
+agent-browser get value @e2 --json            # Current value of an input
+agent-browser get html @e1 --json             # Outer HTML of element
+agent-browser get attr data-id @e1 --json     # Attribute value
+agent-browser get title --json                # Page title
+agent-browser get url --json                  # Current URL
+agent-browser get box @e1 --json              # Bounding box (x, y, width, height)
+```
+
+### Reading page text
+
+```bash
+agent-browser eval "document.body.innerText.split('\n').slice(0, 80).join('\n')"
+```
+
+## Screenshots
+
+Always save to `/tmp/agent-screenshots/` to avoid polluting the project directory. Replace `YYYYMMDD-HHMMSS` with the actual timestamp (e.g. `20260220-143000`).
+
 ```bash
 mkdir -p /tmp/agent-screenshots
 agent-browser screenshot /tmp/agent-screenshots/YYYYMMDD-HHMMSS-description.png
 agent-browser screenshot /tmp/agent-screenshots/YYYYMMDD-HHMMSS-description.png --full
 ```
-**IMPORTANT**: ALWAYS save screenshots in this exact format: `/tmp/agent-screenshots/YYYYMMDD-HHMMSS-description.png`.
-## DEV TOOLS (ALWAYS USE --json)
-### Console Logs (CRITICAL - always use --json!)
+
+## DevTools
+
+### Console and errors
+
+`console` captures all log levels (log, warn, error, debug). `errors` is a subset showing only page errors.
+
 ```bash
-agent-browser console --json                  # View ALL console logs (log, warn, error, debug)
-agent-browser console --clear                 # Clear console buffer
-agent-browser errors --json                   # View page errors only
+agent-browser console --json                  # All console output
+agent-browser console --clear                 # Clear the console buffer
+agent-browser errors --json                   # Page errors only
 ```
-### Cookies & Storage
+
+### Cookies and storage
+
 ```bash
-agent-browser cookies get --json              # Get all cookies
-agent-browser cookies clear                   # Clear cookies
-agent-browser storage local --json            # Get localStorage
-agent-browser storage session --json          # Get sessionStorage
+agent-browser cookies get --json              # All cookies for current session
+agent-browser cookies clear                   # Delete all cookies
+agent-browser storage local --json            # localStorage contents
+agent-browser storage session --json          # sessionStorage contents
 ```
-### Network Requests
+
+### Network
+
 ```bash
-agent-browser network requests --filter "" --json    # View captured requests
-agent-browser network requests --clear               # Clear request buffer
-agent-browser network route "*/api/*" --abort        # Block requests
-agent-browser network route "*/api/*" --body '{"mock":true}'  # Mock response
-agent-browser network unroute                        # Remove all routes
+agent-browser network requests --json         # All captured network requests
+agent-browser network requests --filter "api" --json   # Filter by URL substring
+agent-browser network requests --clear        # Clear the request buffer
+agent-browser network route "*/api/*" --abort          # Block matching requests
+agent-browser network route "*/api/*" --body '{"mock":true}'  # Mock a response
+agent-browser network unroute                 # Remove all route rules
 ```
-### Execute JavaScript
+
+### JavaScript evaluation
+
 ```bash
-agent-browser eval "window.location.href"            # Run JS, get result
-agent-browser eval "document.title"
-agent-browser eval "localStorage.getItem('key')"
-agent-browser eval "console.log('test')"             # Log to console
+agent-browser eval "window.location.href"            # Read a value from the page
+agent-browser eval "localStorage.getItem('token')"   # Inspect storage
+agent-browser eval "document.title"                  # Any JS expression
 ```
-### Debug Helpers
+
+## Authentication
+
+For form-based login:
+
 ```bash
-agent-browser highlight @e1                   # Highlight element visually
-agent-browser trace start                     # Start recording trace
-agent-browser trace stop ./trace.zip          # Stop and save trace file
+agent-browser open https://example.com/login --headed
+agent-browser snapshot -i --json
+agent-browser fill @eUsername "user@example.com"
+agent-browser fill @ePassword "secret"
+agent-browser click @eSubmit
+# Cookies are saved automatically - future open calls stay authenticated
 ```
-## RULES
-1. **First open**: ALWAYS use the open+viewport pattern from section 1
-2. **Cookie banner**: ALWAYS dismiss cookie banners on public sites (accept cookies), unless user asks to keep for debugging
-3. **--headed**: Always use for `open` command (user must see browser) unless headless browser is instructed
-4. **--json**: Always use for console, errors, cookies, storage, network
-5. **snapshot before interact**: Always get fresh @refs before clicking/filling
-6. **re-snapshot after navigation**: Page changes = new @refs
-7. **screenshots**: Save to `.agent-screenshots/YYYYMMDD-HHMMSS-description.png`
-8. **NEVER close session**: `close` deletes cookies = re-login required
-## AUTHENTICATION
-For sites requiring login:
-1. Navigate to login page
-2. Use `fill` for credentials, `click` for submit
-3. Cookies are saved automatically
-4. Future navigations stay authenticated
-## BROWSER SETTINGS
+
+For token-based APIs or localized content, inject headers before navigating:
+
 ```bash
-agent-browser set viewport 1920 1080          # Viewport size
-agent-browser set media dark                  # Dark mode
-agent-browser set media light                 # Light mode
-agent-browser set headers '{"Accept-Language": "it-IT"}'   # Italian
-agent-browser set headers '{"Accept-Language": "en-US"}'   # English
+agent-browser set headers '{"Authorization": "Bearer <token>"}'
+agent-browser set headers '{"Accept-Language": "zh-CN"}'
+agent-browser open https://example.com/api/resource --headed
 ```
-## SESSION MANAGEMENT
+
+## Debugging
+
 ```bash
-agent-browser session list                    # List active sessions
-agent-browser session                         # Current session name
+agent-browser highlight @e1                   # Visually highlight an element in the browser
+agent-browser trace start                     # Begin recording a Playwright trace
+agent-browser trace stop /tmp/trace.zip       # Save trace for inspection
 ```
-**CRITICAL**: `agent-browser close` DESTROYS the session and ALL cookies!
-- After close, you MUST re-login to authenticated sites
-- To preserve auth: just navigate with `open <url>`, never close
-- Only close when you're completely done OR want a fresh start
-## TROUBLESHOOTING
-**Browser not responding**:
+
+### Recovery when browser stops responding
+
+`pkill` loses all cookies. After recovery, re-login to any authenticated sites.
+
 ```bash
-pkill -x agent-browser                        # Kill daemon (loses cookies!)
+pkill -x agent-browser
 sleep 5
-agent-browser open <url> --headed             # Restart fresh (need re-login)
+agent-browser open https://example.com --headed
+agent-browser set viewport 1920 1080
 ```
