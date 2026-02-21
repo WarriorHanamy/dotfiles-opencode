@@ -1,3 +1,9 @@
+# Archibate's Complete Guide to Quality Prompting
+
+forget about AI hype, treating the LLM as a tool with known strengths and weaknesses, not as a magical oracle.
+
+---
+
 Insight: instruction in impretive mood
 
 ---
@@ -73,6 +79,24 @@ You totally have no control over it. You don't even know if GLM will execute the
 
 ---
 
+Insight: Provide ways to reproduce, not just pasting error logs
+
+Bad: this is the error log [Pasted ~100 lines] please fix.
+- GLM can only explain the error, have no right to execute the `xxx.py` to debug on itself - you haven't granted it to do so. resulting in repeatitive human-AI-human-AI conversation loops, wasting your time.
+
+Good: when I run `python xxx.py`, it reports errors. please run it to reproduce this error, investigate why then fix.
+- GLM will iteratively run the `xxx.py` itself, modify accordingly, until it works.
+
+If you say: the reproduce is seemly random, I can hard get it reproduced! so I could only paste the logs from previous error.
+
+Well, this is a typical issue for softwares not applying TDD at the first place...
+
+but if this is the case anyway, you should provide that context to GLM too:
+- "this bug reproduce randomly, occasionally" - GLM starts to think: multi-threading data race
+- "this bug only appears in Release mode" - GLM starts to think: C++ undefinied behaviors?
+
+---
+
 Insight: feasibility study before hand
 
 Bad: optimize this function to <1s
@@ -123,6 +147,8 @@ keep persistent knowledge in documents and codes, not by conversation context. c
 ---
 
 Insight: asking wrongly - question drift
+
+Asking question wisely is a important skill in tech community, this also applies to coding agents. If you are expressing requests in a wrong way, no strange LLMs misunderstand you. and due to the fact LLMs are trained to make human happy, they tends to comply your insist even if their knowledge base know its wrong.
 
 Sometimes you might be asking question in a wrong way - causing irrevertible information loss, that even Einstein won't be able to recover your original problem. Here's an example:
 
@@ -314,3 +340,21 @@ B: B is xxx, see src/b.py.
 C: C is xxx, see tests/c.py.
 
 let the code explain itself! LLMs can understand your codebase quickly by need, no need for bloat comments and md documents.
+
+---
+
+Insight: make good, meanful name to functions and APIs
+
+GLM tends to misunderstand functions if you name badly.
+
+Bad: morning_time
+Good: sunrise_time, morning_auction_start_time, morning_commute_duration, school_first_class_time
+
+LLMs are good at both English and coding. a good interface name in English allows GLM to understand what this is at first glance, without have to read the document or implementation detail to use correctly - if they happens didn't, hallucination occurs.
+
+Bad: sleep(1000)
+Good: this_thread::sleep_for(chrono::seconds(1))
+
+let the code explain itself always outperforms by documents and comments.
+
+in ideal, totally no documents are necessary as the highly-structured code itself is document already.
