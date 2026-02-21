@@ -16,6 +16,112 @@ LLMs follow instructions best when they are unambiguous and ordered. A strict ta
 
 ---
 
+Insight: man-made 'plan' mode, postfix to append to your prompt prevents GLM hullucination
+
+---
+
+opencode has a built-in PLAN mode, switching to it the agent will be prevented from editing files. a typical usage is: switch to PLAN mode -> say what you want -> agent response with a detailed plan ask you to review -> switch to BUILD mode -> ask agent to execute the previous plan.
+
+Now I'm saying:
+
+Just keep in BUILD mode of opencode, no need to switch to PLAN. we ask for plan manually by adding these postfix to your prompt:
+
+Postfix: show your plan before edit.
+
+For example, edit function X to make it faster, show your plan before edit.
+
+Effect:
+
+GLM will first show a its plan in text, then it will proceed to edit without user interference.
+
+The plan is not for the user, but for GLM itself. 
+
+Tech detail: LLM have no hidden states except previous context! by outputing a detailed text plan before outputing code, it literally 'locks' what to do for the future code generation.
+
+here, the plan chunk act as a 'thinking' context, making the 'edit' more concentrated, less likely to hullucinate.
+
+The built-in thinking is oftenly too rush, not enough context for GLM to making a detailed plan. However, when user explicit asking 'output a plan before edit'. GLM would use the 'thinking' tokens to think for a plan, and try its best to present a high-quality text plan, try to make it suitable for human reading. while thinking tokens are oftenly not. this plan provides a more clear guidence to following code generation, preventing code generation from shifting in-the-middle-way.
+
+---
+
+Postfix: show your plan, no edit.
+
+For example, I want to wrap this web app into an electron app, show your plan.
+
+Effect:
+
+GLM will show a detailed plan to you, then stop, asking your agreement.
+
+You say "proceed" or raise issues, ask for changing the plan. and GLM continue to edit.
+
+This is to confirm GLM is fully aligned with your mind. I constantly finding I have said ambiguity words, or GLM being extending my plan way too much, into purely flaw.
+
+also times am I realized my idea was actually not even feasible after GLM shows plan, so I can cancel the plan after realized that.
+
+By PAUSE, let me confirming, correcting dynamically in conversation, before plan execute: I prevented unmature ideas being overinterpreted by GLM, avoids wasting time producing tons of code not matching my will.
+
+---
+
+Bad: I want X function in Y module. (no 'plan' postfix in prompt)
+
+GLM could:
+
+1. execute edit directly, but the edit can be off from your intent.
+2. first show you a plan, findings. get into this good branch purely by chance.
+
+You totally have no control over it. You don't even know if GLM will execute the edit in this round.
+
+---
+
+Insight: feasibility study before hand
+
+Bad: optimize this function to <1s
+- You have no clue that this function is actually possible to <1s at all. GLM would have to fool you, or making this function not working correctly to get your hard-coded goal.
+
+Good: investigate optimization opptunities in this function
+- Not setting a hard target, instead, you ask GLM to study feasibility first. whatever finally found feasible or not, this gives GLM more time to investigate, prevents GLM from rush into bizzare revamp to this function
+
+Good: this function is slow (~20s) in XXX condition, but fast (<1s) in YYY condition, please investigate why
+- Provide a reproduction guide, both Red and Green are provided, allowing GLM to reproduce these results itself, make a good starting point for investigation
+
+Good: what is the major blocker for this function performing slow: algorithmic complicity or constant overhead?
+- Offering two good starting point of analyzing performance issues, set GLM a clear starting point.
+
+Good: write a test case (if not have yet) for this function, cover all edge cases, then run test to make sure it pass. then begin optimize this function, make sure function pass test after optimization, without editing test. give up optimization approaches that make the function regress in test.
+- Use a test to ensure function is not regressed after bizzare optimization, if you haven't one yet.
+
+---
+
+Insight: try this: human write code, AI reviews
+
+actually I find LLM preforms code review very well. it always catch my bugs that I didn't even notice, points out undefinied behaviors in C++, English grammar issues and typos.
+
+as a contrast, asking LLM writing code with domain-specific knowledge is constantly filled with hullucinatation, need taken very carefully.
+
+actually some statistics shows that programers take 80% of their time in testing and debugging loop, not in writing code. writing code is strightforward (at least for most ACM winners), validation is the bottleneck, while code review and testing are the two main steps for validating code quality.
+
+no 'shame' to insist write code manually in the age of 'AI hype', especially for code requiring highly skilled domain knowledge. by writing code yourself, verifying with AI, you are actually speeding up the '80%' of work time with AI power!
+
+this flips the typical 'AI writes, human reviews' pattern and leverages the model's strength as a critic.
+
+writing code is small (user request) -> big (full code), suffering from the well-known 'dimension diaster', can easily get hallucinated; code review is big (full code) -> small (classify good or not), which has long been a solid industral scenario for NLPs to act as classifiers, before autoregressive LLMs have been invented. classification has always been the most robust AI model target all the ways.
+
+---
+
+Insight: create a fresh conversation for each task
+
+just start a new conversation (session) for every new task.
+
+do not try to keep a 'god session' where all your works are done in, as if you are raising a baby.
+
+LLMs are poor in memory, they are stateless autoregressive next token predictors based on all previous context. it can't memorize more beyond context window. even if context window is huge (1M for some top models), only a tiny fraction of context is remain active thanks to the attention mechanism - otherwise would suffer O(n^2) complicity diaster making LLMs impossible to train. the acutally useful context highly sparse, while you still have to pay money (and latency) for all of them at equal price.
+
+knowledge is severely lost during the compaction when context is full, the agent basically needs to explore the codebase from scratch to get back necessary context for continue task, so we should try our best to prevent from making context long enough to have to trigger compaction.
+
+keep persistent knowledge in documents and codes, not by conversation context. conversation is meant to be one-off use, long-term memory must solidates to filesystem for future agent to explore and recover.
+
+---
+
 Insight: asking wrongly - question drift
 
 Sometimes you might be asking question in a wrong way - causing irrevertible information loss, that even Einstein won't be able to recover your original problem. Here's an example:
@@ -95,63 +201,6 @@ If CoT did make GLM listed all A, B, C, D explicitly in thinking text, then why 
 
 ---
 
-Insight: man-made 'plan' mode, postfix to append to your prompt prevents GLM hullucination.
-
----
-
-opencode has a built-in PLAN mode, switching to it the agent will be prevented from editing files. a typical usage is: switch to PLAN mode -> say what you want -> agent response with a detailed plan ask you to review -> switch to BUILD mode -> ask agent to execute the previous plan.
-
-Now I'm saying:
-
-Just keep in BUILD mode of opencode, no need to switch to PLAN. we ask for plan manually by adding these postfix to your prompt:
-
-Postfix: show your plan before edit.
-
-For example, edit function X to make it faster, show your plan before edit.
-
-Effect:
-
-GLM will first show a its plan in text, then it will proceed to edit without user interference.
-
-The plan is not for the user, but for GLM itself. 
-
-Tech detail: LLM have no hidden states except previous context! by outputing a detailed text plan before outputing code, it literally 'locks' what to do for the future code generation.
-
-here, the plan chunk act as a 'thinking' context, making the 'edit' more concentrated, less likely to hullucinate.
-
-The built-in thinking is oftenly too rush, not enough context for GLM to making a detailed plan. However, when user explicit asking 'output a plan before edit'. GLM would use the 'thinking' tokens to think for a plan, and try its best to present a high-quality text plan, try to make it suitable for human reading. while thinking tokens are oftenly not. this plan provides a more clear guidence to following code generation, preventing code generation from shifting in-the-middle-way.
-
----
-
-Postfix: show your plan, no edit.
-
-For example, I want to wrap this web app into an electron app, show your plan.
-
-Effect:
-
-GLM will show a detailed plan to you, then stop, asking your agreement.
-
-You say "proceed" or raise issues, ask for changing the plan. and GLM continue to edit.
-
-This is to confirm GLM is fully aligned with your mind. I constantly finding I have said ambiguity words, or GLM being extending my plan way too much, into purely flaw.
-
-also times am I realized my idea was actually not even feasible after GLM shows plan, so I can cancel the plan after realized that.
-
-By PAUSE, let me confirming, correcting dynamically in conversation, before plan execute: I prevented unmature ideas being overinterpreted by GLM, avoids wasting time producing tons of code not matching my will.
-
----
-
-Bad: I want X function in Y module. (no 'plan' postfix in prompt)
-
-GLM could:
-
-1. execute edit directly, but the edit can be off from your intent.
-2. first show you a plan, findings. get into this good branch purely by chance.
-
-You totally have no control over it. You don't even know if GLM will execute the edit in this round.
-
----
-
 Insight: when requesting changes:
 
 1. provide context, e.g. I'm making frontend design / doing prompt engineering. 'workflow' can have different meaning in prompt engineering and frontend.
@@ -169,7 +218,21 @@ GLM could think: do you want me to roleplay the brainstorm agent? Ok, I won't as
 
 ---
 
-Insight: Use a list of 'impretive' verbs.
+Insight: making commits by agent is low-risk and time-saving
+
+just say: make a commit
+
+and GLM will automatically stage the correct files, skip the binary artifact files, review what is changed, make a commit with a clear message following github community best pratices.
+
+Since opencode has a CLI usage, you can actually make an alias:
+
+alias commit='opencode run "stage unstaged files, create or update .gitignore if necessary, make a commit with a clear multiline message following github community best pratices, do not modify code, do not ask"'
+
+This removes all pain in tackling stupid files, maintaining gitignore file and thinking hard writing commit message for me. GLM is working well in these simple daily dev-ops tasks, since there is nothing to hallucinate.
+
+---
+
+Insight: Use a list of impretive verbs - especially when defining long-term workflows to be ran in background without human interception
 
 a clear step by step guide makes GLM easy to follow, no ambiguity, no overinterpretation.
 
@@ -225,7 +288,7 @@ otherwise you would have to 'pray' the agent is able to discover this document i
 
 ---
 
-Insight: No bloating AGENTS.md
+Insight: No bloating AGENTS.md (and plugins)
 
 AGENTS.md is a standard path for all agentic programming tools (opencode, crush, ...). they always read AGENTS.md in your project root folder, and attach the full content of it prior to EVERY conversation.
 
@@ -263,67 +326,4 @@ A: A is xxx, see docs/a.md.
 B: B is xxx, see src/b.py.
 C: C is xxx, see tests/c.py.
 
-let the code explain itself! LLMs can understand your code intent quickly, no need for bloat comments and md documents):
-
----
-
-Insight: feasibility study before hand
-
-Bad: optimize this function to <1s
-- You have no clue that this function is actually possible to <1s at all. GLM would have to fool you, or making this function not working correctly to get your hard-coded goal.
-
-Good: investigate optimization opptunities in this function
-- Not setting a hard target, instead, you ask GLM to study feasibility first. whatever finally found feasible or not, this gives GLM more time to investigate, prevents GLM from rush into bizzare revamp to this function
-
-Good: this function is slow (~20s) in XXX condition, but fast (<1s) in YYY condition, please investigate why
-- Provide a reproduction guide, both Red and Green are provided, allowing GLM to reproduce these results itself, make a good starting point for investigation
-
-Good: what is the major blocker for this function performing slow: algorithmic complicity or constant overhead?
-- Offering two good starting point of analyzing performance issues, set GLM a clear starting point.
-
-Good: write a test case (if not have yet) for this function, cover all edge cases, then run test to make sure it pass. then begin optimize this function, make sure function pass test after optimization, without editing test. give up optimization approaches that make the function regress in test.
-- Use a test to ensure function is not regressed after bizzare optimization, if you haven't one yet.
-
----
-
-Insight: try this: human write code, AI reviews
-
-actually I find LLM preforms code review very well. it always catch my bugs that I didn't even notice, points out undefinied behaviors in C++, English grammar issues and typos.
-
-as a contrast, asking LLM writing code with domain-specific knowledge is constantly filled with hullucinatation, need taken very carefully.
-
-actually some statistics shows that programers take 80% of their time in testing and debugging loop, not in writing code. writing code is strightforward (at least for most ACM winners), validation is the bottleneck, while code review and testing are the two main steps for validating code quality.
-
-no 'shame' to insist write code manually in the age of 'AI hype', especially for code requiring highly skilled domain knowledge. by writing code yourself, verifying with AI, you are actually speeding up the '80%' of work time with AI power!
-
-this flips the typical 'AI writes, human reviews' pattern and leverages the model's strength as a critic.
-
-writing code is small (user request) -> big (full code), suffering from the well-known 'dimension diaster', can easily get hallucinated; code review is big (full code) -> small (classify good or not), which has long been a solid industral scenario for NLPs to act as classifiers, before autoregressive LLMs have been invented. classification has always been the most robust AI model target all the ways.
-
----
-
-Insight: create a fresh conversation for each task
-
-just start a new conversation (session) for every new task.
-
-do not try to keep a 'god session' where all your works are done in, as if you are raising a baby.
-
-LLMs are poor in memory, they are stateless autoregressive next token predictors based on all previous context. it can't memorize more beyond context window. even if context window is huge (1M for some top models), only a tiny fraction of context is remain active thanks to the attention mechanism - otherwise would suffer O(n^2) complicity diaster making LLMs impossible to train. the acutally useful context highly sparse, while you still have to pay money (and latency) for all of them at equal price.
-
-knowledge is severely lost during the compaction when context is full, the agent basically needs to explore the codebase from scratch to get back necessary context for continue task, so we should try our best to prevent from making context long enough to have to trigger compaction.
-
-keep persistent knowledge in documents and codes, not by conversation context. conversation is meant to be one-off use, long-term memory must solidates to filesystem for future agent to explore and recover.
-
----
-
-Insight: make commits using agent
-
-just say: make a commit
-
-and GLM will automatically stage the correct files, skip the binary artifact files, review what is changed, make a commit with a clear message following github community best pratices.
-
-Since opencode has a CLI usage, you can actually make an alias:
-
-alias commit='opencode run "stage unstaged files, create or update .gitignore if necessary, make a commit with a clear multiline message following github community best pratices, do not modify code, do not ask"'
-
-This removes all pain in tackling stupid files, maintaining gitignore file and thinking hard writing commit message for me. GLM is working well in these simple daily dev-ops tasks, since there is nothing to hallucinate.
+let the code explain itself! LLMs can understand your codebase quickly by need, no need for bloat comments and md documents.
