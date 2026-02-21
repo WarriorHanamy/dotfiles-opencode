@@ -95,9 +95,11 @@ but if this is the case anyway, you should provide that context to GLM too:
 - "this bug reproduce randomly, occasionally" - GLM starts to think: multi-threading data race
 - "this bug only appears in Release mode" - GLM starts to think: C++ undefinied behaviors?
 
-For the long run, its highly recommended to make your software decoupled, make sure each compoment can be testec individually. otherwise you would have to test the system as a whole in intergation or even e2e tests.
+For the long run, its highly recommended to make your software decoupled, make sure each compoment can be tested independently. otherwise you would have to test the system as a whole in intergation or even e2e tests.
 
 one of the TDD philosophy is the 'test suite pyramid': discover issues eariler as possible, if a feature can be tested in unit test, no postpone it to intergation test; if can be tested in autonomous intergation test, never postone to manual e2e test.
+
+At the first place, you should write standalone modules individually, do not ever intergate into a whole before all unit tests pass.
 
 For example, you are writing a HPC fluid simulation, suffering occasionally multi-threading data race crash.
 
