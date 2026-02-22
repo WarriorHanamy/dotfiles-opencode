@@ -1,7 +1,7 @@
 ---
 name: tdd-workflow
 description: |
-    Use when implementing new features or fixing bugs. Following a strict Test-Driven Development workflow.
+    Use this skill for developing software in TDD (Test-Driven Design).
 ---
 
 # TDD Workflow
