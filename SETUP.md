@@ -9,7 +9,7 @@ This guide is for human, LLM agents please do not execute these steps without ex
 ```bash
 curl -fsSL https://opencode.ai/install | bash
 
-sudo pacman -S uv
+sudo pacman -S uv ruff
 
 npm config set prefix ~/.local
 npm install -g agent-browser
