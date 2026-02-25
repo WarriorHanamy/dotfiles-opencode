@@ -21,12 +21,14 @@
 
 - Make sure `git status` shows no garbage files; update `.gitignore` accordingly
 - Write one-off analyzation scripts to `/tmp` folder; do not pollute project follder
-- Use setup- f getting started on an empty project
+- Use setup-fresh-project skill to getting started on an empty project
 
 ## Background Tasks
 
-Use PTY tools when:
+Use the PTY tools when:
 1. Before any tasks that can potentially run for more than 2 minutes (e.g.: package install, many tests, model training)
 2. Before any tasks that are expected to run indefinitely in background (e.g.: web servers, port forwarding)
 3. Bash tool reports `timeout after 120000ms`
 4. User request to run tasks in background
+
+PTY tools are available as `pty_*`.
