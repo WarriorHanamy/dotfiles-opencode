@@ -31,13 +31,6 @@ uv --version
 If your version is older than 0.9.0, upgrade for the best experience:
 
 ```bash
-# Using pip
-pip install --upgrade uv
-
-# Or reinstall using official installer
-# Windows
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-
 # Unix/Mac
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
@@ -127,29 +120,6 @@ Need to run a Python package?
     }
   }
 }
-```
-
-**Key insight**: `--from` flag IS the working directory reference for UVX.
-
-### 4. Virtual Environment Management
-
-UV works seamlessly with Python's built-in venv:
-
-```bash
-# Create virtual environment
-python -m venv .venv
-
-# Activate (Windows Git Bash)
-. .venv/Scripts/activate
-
-# Activate (Windows CMD)
-.venv\Scripts\activate.bat
-
-# Activate (Linux/Mac)
-source .venv/bin/activate
-
-# Install packages with UV
-uv pip install -r requirements.txt
 ```
 
 ## Common Workflows
@@ -357,24 +327,6 @@ For `.continue/config.json`:
 - Mix venv and system Python packages
 - Forget to activate before development
 - Commit .venv directory to version control
-
-## Performance Characteristics
-
-UV's performance advantages:
-
-- **10-100x faster** than pip for package operations
-- **Parallel downloads** and installations
-- **Global cache** with deduplication
-- **Rust-powered** dependency resolution
-- **Disk-efficient** storage with hard links
-
-Typical operation times:
-
-- Package installation: 100-1000x faster than pip
-- Dependency resolution: Near-instant for cached packages
-- Virtual environment creation: <1 second
-- UVX first run: Package download time + execution
-- UVX cached run: <1 second startup
 
 ## Troubleshooting
 

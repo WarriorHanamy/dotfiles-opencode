@@ -203,7 +203,26 @@ When writing task list, think if each task requires any skills. Add relevant ski
 
 ## Output Format: tasks.json Structure
 
-After the user agrees to the plan, create a JSON file `tasks.json` with the following exact structure:
+Before writing the plan, determine **scope** (root repo vs. submodule) and follow the naming convention `[root-or-submodule]_tasks.json` stored in the **project root** (the directory returned by `git rev-parse --show-toplevel`). Examples:
+
+- Root repo plan → `/home/rec/server/root_tasks.json`
+- vtol-interface submodule plan → `/home/rec/server/tasks/vtol-interface_tasks.json`
+
+Procedure:
+1. Run `git rev-parse --show-toplevel` to get the project root path (`ROOT`).
+2. Decide the scope name (`root`, `vtol-interface`, etc.). If not provided by the user, default to `root`.
+3. Derive the scope directory and task file using command substitution:
+   - If scope == `root`:
+     - `scope_dir = $(git rev-parse --show-toplevel)`
+     - `tasks_file = $(git rev-parse --show-toplevel)/root_tasks.json`
+   - Else (submodule scope):
+     - `scope_dir = $(git rev-parse --show-toplevel)/<scope>`
+     - `tasks_file = $(git rev-parse --show-toplevel)/tasks/<scope>/tasks.json`
+     - Create the parent directories if they do not exist. The `tasks/<scope>/` folder becomes the sandbox for Executor/Worker to read/write.
+4. Never write tasks.json directly inside a submodule’s git-working directory if it is not within the designated scope folder. Keep all scope planners consolidated under the project root.
+5. When responding to the user, explicitly state the scope name, scope directory, and tasks file path so the Executor knows where to work.
+
+After the user agrees to the plan, create the JSON file with the following exact structure:
 
 ```json
 {
@@ -485,5 +504,3 @@ If a `description` spans multiple lines or contains multiple sentences:
 - If the user rejects the plan entirely, ask one focused question to identify the core disagreement, then revise and re-present.
 - If the user partially accepts, explicitly list which parts are confirmed and which need revision before updating the plan.
 - Revision rounds are limited to 3. If alignment is not reached after 3 rounds, summarize the unresolved points and ask the user to make a final decision.
-
-

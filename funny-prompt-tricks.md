@@ -4,7 +4,7 @@ forget about AI hype, treating the LLM as a tool with known strengths and weakne
 
 ---
 
-Insight: instruction in impretive mood
+Insight: instruction in imperative mood
 
 ---
 
@@ -120,7 +120,7 @@ Good: investigate optimization opptunities in this function
 Good: this function is slow (~20s) in XXX condition, but fast (<1s) in YYY condition, please investigate why
 - Provide a reproduction guide, both Red and Green are provided, allowing GLM to reproduce these results itself, make a good starting point for investigation
 
-Good: what is the major blocker for this function performing slow: algorithmic complicity or constant overhead?
+Good: what is the major blocker for this function performing slow: algorithmic complixity or constant overhead?
 - Offering two good starting point of analyzing performance issues, set GLM a clear starting point.
 
 Good: write a test case (if not have yet) for this function, cover all edge cases, then run test to make sure it pass. then begin optimize this function, make sure function pass test after optimization, without editing test. give up optimization approaches that make the function regress in test.
@@ -134,7 +134,7 @@ actually I find LLM preforms code review very well. it always catch my bugs that
 
 as a contrast, asking LLM writing code with domain-specific knowledge is constantly filled with hullucinatation, need taken very carefully.
 
-actually some statistics shows that programers take 80% of their time in testing and debugging loop, not in writing code. writing code is strightforward (at least for most ACM winners), validation is the bottleneck, while code review and testing are the two main steps for validating code quality.
+actually some statistics shows that programers take 80% of their time in testing and debugging loop, not in writing code. writing code is strightforward (at least for most ACM winners), verfication is the bottleneck, while code review and testing are the two main steps for verify code quality.
 
 no 'shame' to insist write code manually in the age of 'AI hype', especially for code requiring highly skilled domain knowledge. by writing code yourself, verifying with AI, you are actually speeding up the '80%' of work time with AI power!
 
@@ -162,7 +162,7 @@ Insight: asking wrongly - question drift
 
 Asking question wisely is a important skill in tech community, this also applies to coding agents. If you are expressing requests in a wrong way, no strange LLMs misunderstand you. and due to the fact LLMs are trained to make human happy, they tends to comply your insist even if their knowledge base know its wrong.
 
-Sometimes you might be asking question in a wrong way - causing irrevertible information loss, that even Einstein won't be able to recover your original problem. Here's an example:
+Sometimes you might be asking question in a wrong way - causing irreversible information loss, that even Einstein won't be able to recover your original problem. Here's an example:
 
 You want to achieve X.
 
@@ -218,7 +218,7 @@ Bad:
 - GLM: You are absolutely right! LightGBM is an excellant solution to xxx classification because... (GLM drawing the target before archery)
 - You: GLM agreed with me! but is this a industral consensus, or due to the fact that I'm mentioning LightGBM? not sure.
 
-if you already know LightGBM is the best choice, why would you still ask? -> use the 'impretive mood' to ask agent execute it directly.
+if you already know LightGBM is the best choice, why would you still ask? -> use the 'imperative mood' to ask agent execute it directly.
 
 if you don't know what is the best choice, why not be humble when ask? -> investigate, ask agent do web search for state-of-art solution.
 
@@ -289,7 +289,7 @@ GLM could think: do you want me to roleplay the brainstorm agent? Ok, I won't as
 
 ---
 
-Insight: Use a list of impretive verbs - especially when defining long-term workflows to be ran in background without human interception
+Insight: Use a list of imperative verbs - especially when defining long-term workflows to be ran in background without human interception
 
 a clear step by step guide makes GLM easy to follow, no ambiguity, no overinterpretation.
 
@@ -299,7 +299,7 @@ Bad: the X function is reluctant since it is no longer used in Y and Z module, w
 
 Good: remove the X function in Y module. check for references of symbol X.
 
-An extensive example of 'a list of impretive verbs' is defining a workflow, as I done in agent/executor.md and skills/tdd-workflow/SKILL.md. a strict steps to follow, is way better than tons technical preach.
+An extensive example of 'a list of imperative verbs' is defining a workflow, as I done in agent/executor.md and skills/tdd-workflow/SKILL.md. a strict steps to follow, is way better than tons technical preach.
 
 'superpowers' and 'oh-my-opencode' (totally hype, I uninstalled it in 1 day) are great bad examples in my view of prompt engineering - see https://github.com/obra/superpowers/blob/main/skills/test-driven-development/SKILL.md, it write tons of 'iron raw', 'ALL CAPITCAL', fancy memraids, but never define a clear steps for LLM to follow - totally self perceived preaching, as if a talkative stupid professor is preaching a human fellow, tons of shits wasting your tokens.
 
@@ -307,7 +307,7 @@ If your only got a blurry idea, cannot form a clear list of steps in your mind:
 
 first talk with GLM to brainstorm, prompt it to discuss possbility and feasibility only, not execute.
 
-when idea is clearified, ask GLM to create a list of steps in impretive mood (with 'show the list of steps, no execute' postfix). then you confirm these steps, and say 'execute.'
+when idea is clearified, ask GLM to create a list of steps in imperative mood (with 'show the list of steps, no execute' postfix). then you confirm these steps, and say 'execute.'
 
 This would be way more effcient than directly tell GLM the idea to execute without discussing to produce a concrete list of steps.
 
