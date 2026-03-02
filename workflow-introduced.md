@@ -430,7 +430,7 @@ Catch bugs at the earliest possible layer:
 | `setup-fresh-project`        | Starting new project                     |
 | `installing-dependencies`    | Installing packages or tools             |
 | `verification-before-completion` | Critical verification needed         |
-| `writing-python`             | Python development with uv               |
+| `writing-python`             | Python development with project wrapper  |
 | `writing-bash-scripts`       | Creating or refactoring shell scripts    |
 | `cli-creator`                | Designing CLI interfaces                 |
 | `mistake-notebook`           | Learning from historical problems        |
