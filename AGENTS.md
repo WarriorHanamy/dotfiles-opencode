@@ -23,8 +23,9 @@
 
 - Existing projects follow repository style configs and local patterns.
 - Fresh projects use 2-space indentation by default.
-- Python workflows prefer `bins/py_exec` wrapper, then `uv python`,
-  then `python3`, then `python`.
+- Python workflows must use `$PROJECT_DIR/agent_bins/python` (or `./agent_bins/python`)
+  when available; do not use bare `python`.
+- If project wrapper is unavailable, prefer `bins/py_exec`, then `uv python`, then `python3`.
 
 ## Workspace Hygiene
 
