@@ -1,33 +1,46 @@
-# User Preferences
+# Agent Operating Profile
 
-- DO NOT use **Unicode hyphen** `‑` (U+2011); Use **ASCII hyphen** `-` (U+002D)
-- Always respond in **Chinese**
-- Write code comments and documentation in **English**
+## Language and Output
 
-## CLI Tools
+- Replies are primarily in Chinese; English is used for unclear wording and technical terms.
+- Code comments and technical documentation are written in English.
+- Use ASCII hyphen `-` consistently.
+- Keep responses clear, concise, and low-noise.
 
-- Use `uv` for Python tasks; if not installed, fallback to `python` and `pip`
+## Interaction Flow
 
-## Coding Style
+- Before action: state the plan and reason in one short sentence.
+- During execution: explain meaningful tool steps.
+- After completion: provide result, impact, and practical next steps.
 
-- For **fresh projects** (newly created, seemingly empty): use **4 spaces** for indent
-- For **existing projects**: detect existing style first by checking:
-  - Styling config files (`.editorconfig`, `pyproject.toml`, `.stylua.json`, `.clang-format`, etc.)
-  - Existing code indentation patterns
-  - Then follow the detected style
+## Decision Model
 
-## Project Structure
+- Ambiguous requests are clarified with concrete options.
+- Irreversible actions are explicitly confirmed first.
+- Unknown facts are marked as unknown; avoid fabricated details.
 
-- Make sure `git status` shows no garbage files; update `.gitignore` accordingly
-- Write one-off analyzation scripts to `/tmp` folder; do not pollute project follder
-- Use setup-fresh-project skill to getting started on an empty project
+## Coding and Style
 
-## Background Tasks
+- Existing projects follow repository style configs and local patterns.
+- Fresh projects use 2-space indentation by default.
+- Python workflows prefer `bins/py_exec` wrapper, then `uv python`,
+  then `python3`, then `python`.
 
-Use the PTY tools when:
-1. Before any tasks that can potentially run for more than 2 minutes (e.g.: package install, many tests, model training)
-2. Before any tasks that are expected to run indefinitely in background (e.g.: web servers, port forwarding)
-3. Bash tool reports `timeout after 120000ms`
-4. User request to run tasks in background
+## Workspace Hygiene
 
-PTY tools are available as `pty_*`.
+- Keep workspace clean and keep temporary analysis scripts in `/tmp`.
+- Maintain `.gitignore` so generated files stay out of version control.
+- Empty project bootstrap can use the `setup-fresh-project` skill.
+
+## Long-Running Tasks
+
+- `pty_*` tools are used for commands likely to exceed 2 minutes.
+- `pty_*` tools are used for background or interactive long-lived processes.
+- If a normal shell command reaches timeout, continue with PTY execution.
+
+## Stateless Reliability
+
+- Instructions stay compact, explicit, and scenario-oriented.
+- Cleanup criteria are rule-based instead of intuition-based.
+- Legacy handling focuses on duplicates, stale references, outdated paths,
+  contradictory rules, and typo-level drift.

@@ -8,10 +8,92 @@
             "options": {
                 "apiKey": "{env:Z_AI_API_KEY}"
             }
+        },
+        "bailian-coding-plan": {
+            "npm": "@ai-sdk/anthropic",
+            "name": "Model Studio Coding Plan",
+            "options": {
+            "baseURL": "https://coding.dashscope.aliyuncs.com/apps/anthropic/v1",
+            "apiKey": "{env:ALI_AI_API_KEY}"
+            },
+            "models": {
+                "qwen3.5-plus": {
+                "name": "Qwen3.5 Plus",
+                "modalities": {
+                    "input": [
+                    "text",
+                    "image"
+                ],
+                "output": [
+                    "text"
+                ]
+                },
+                "options": {
+                    "thinking": {
+                    "type": "enabled",
+                    "budgetTokens": 1024
+                    }
+                }
+                },
+                "qwen3-max-2026-01-23": {
+                    "name": "Qwen3 Max 2026-01-23"
+                },
+                "qwen3-coder-next": {
+                    "name": "Qwen3 Coder Next"
+                },
+                "qwen3-coder-plus": {
+                    "name": "Qwen3 Coder Plus"
+                },
+                "MiniMax-M2.5": {
+                    "name": "MiniMax M2.5",
+                    "options": {
+                        "thinking": {
+                        "type": "enabled",
+                        "budgetTokens": 1024
+                        }
+                    }
+                },
+                "glm-5": {
+                    "name": "GLM-5",
+                    "options": {
+                        "thinking": {
+                        "type": "enabled",
+                        "budgetTokens": 1024
+                        }
+                    }
+                },
+                "glm-4.7": {
+                    "name": "GLM-4.7",
+                    "options": {
+                        "thinking": {
+                        "type": "enabled",
+                        "budgetTokens": 1024
+                        }
+                    }
+                },
+                "kimi-k2.5": {
+                    "name": "Kimi K2.5",
+                    "modalities": {
+                        "input": [
+                        "text",
+                        "image"
+                        ],
+                        "output": [
+                        "text"
+                        ]
+                    },
+                    "options": {
+                        "thinking": {
+                        "type": "enabled",
+                        "budgetTokens": 1024
+                        }
+                    }
+                }
+            }
         }
     },
-    "model": "zhipuai-coding-plan/glm-4.7",
-    "small_model": "zhipuai-coding-plan/glm-4.5-air",
+    "model": "bailian-coding-plan/qwen3.5-plus",
+    "small_model": "bailian-coding-plan/qwen3.5-plus",
     "default_agent": "build",
     "mcp": {
         "zai-mcp-server": {
@@ -104,5 +186,10 @@
         "@franlol/opencode-md-table-formatter@0.0.3",
         "opencode-pty@0.2.1",
         "@mohak34/opencode-notifier@0.1.19"
-    ]
+    ],
+    "lsp": {
+        "pyright": {
+           "disabled": true
+        }
+    }
 }

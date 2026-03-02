@@ -1,3 +1,8 @@
+---
+name: gh-discussion-api
+description: Create and manage GitHub Discussions using gh CLI and GraphQL API. Use when creating GitHub discussions, managing discussion categories, or automating discussion workflows.
+---
+
 # GitHub Discussion API Skill
 
 ## Overview
