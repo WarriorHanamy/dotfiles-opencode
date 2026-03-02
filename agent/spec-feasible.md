@@ -1,7 +1,8 @@
 ---
 description: Spec-Feasible
 mode: subagent
-temperature: 0.0
+temperature: 1.0
+model: openai/gpt-5.3-codex
 ---
 
 **Role**

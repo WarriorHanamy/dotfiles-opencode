@@ -1,7 +1,7 @@
 ---
 description: General Agent
 mode: primary
-temperature: 0.7
+temperature: 1.0
 color: "#21aec4"
 model: bailian-coding-plan/qwen3.5-plus
 tools:

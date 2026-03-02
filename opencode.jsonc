@@ -31,7 +31,7 @@
                 "options": {
                     "thinking": {
                     "type": "enabled",
-                    "budgetTokens": 1024
+                    "budgetTokens": 38912
                     }
                 }
                 },
@@ -49,7 +49,7 @@
                     "options": {
                         "thinking": {
                         "type": "enabled",
-                        "budgetTokens": 1024
+                        "budgetTokens": 38912
                         }
                     }
                 },
@@ -58,7 +58,7 @@
                     "options": {
                         "thinking": {
                         "type": "enabled",
-                        "budgetTokens": 1024
+                        "budgetTokens": 38912
                         }
                     }
                 },
@@ -67,7 +67,7 @@
                     "options": {
                         "thinking": {
                         "type": "enabled",
-                        "budgetTokens": 1024
+                        "budgetTokens": 38912
                         }
                     }
                 },
@@ -85,14 +85,14 @@
                     "options": {
                         "thinking": {
                         "type": "enabled",
-                        "budgetTokens": 1024
+                        "budgetTokens": 38912
                         }
                     }
                 }
             }
         }
     },
-    "model": "bailian-coding-plan/qwen3.5-plus",
+    "model": "bailian-coding-plan/glm-4.7",
     "small_model": "bailian-coding-plan/qwen3.5-plus",
     "default_agent": "build",
     "mcp": {

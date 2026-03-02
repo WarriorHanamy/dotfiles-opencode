@@ -42,5 +42,3 @@
 
 - Instructions stay compact, explicit, and scenario-oriented.
 - Cleanup criteria are rule-based instead of intuition-based.
-- Legacy handling focuses on duplicates, stale references, outdated paths,
-  contradictory rules, and typo-level drift.
