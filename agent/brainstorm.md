@@ -204,24 +204,14 @@ When writing task list, think if each task requires any skills. Add relevant ski
 
 ## Output Format: tasks.json Structure
 
-Before writing the plan, determine **scope** (root repo vs. submodule) and follow the naming convention `[root-or-submodule]_tasks.json` stored in the **project root** (the directory returned by `git rev-parse --show-toplevel`). Examples:
-
-- Root repo plan → `/home/rec/server/root_tasks.json`
-- vtol-interface submodule plan → `/home/rec/server/tasks/vtol-interface_tasks.json`
+Always write the planning file as `tasks.json` located at the repository root. Define `top_level_dir=$(git rev-parse --show-toplevel)` and place the file at `top_level_dir/tasks.json`. Every task must encode the directory it targets via the `project-dir` field so Executors know where to work.
 
 Procedure:
-1. Run `git rev-parse --show-toplevel` to get the project root path (`ROOT`).
-2. Decide the scope name (`root`, `vtol-interface`, etc.). If not provided by the user, default to `root`.
-3. Derive the scope directory and task file using command substitution:
-   - If scope == `root`:
-     - `scope_dir = $(git rev-parse --show-toplevel)`
-     - `tasks_file = $(git rev-parse --show-toplevel)/root_tasks.json`
-   - Else (submodule scope):
-     - `scope_dir = $(git rev-parse --show-toplevel)/<scope>`
-     - `tasks_file = $(git rev-parse --show-toplevel)/tasks/<scope>/tasks.json`
-     - Create the parent directories if they do not exist. The `tasks/<scope>/` folder becomes the sandbox for Executor/Worker to read/write.
-4. Never write tasks.json directly inside a submodule’s git-working directory if it is not within the designated scope folder. Keep all scope planners consolidated under the project root.
-5. When responding to the user, explicitly state the scope name, scope directory, and tasks file path so the Executor knows where to work.
+1. Run `top_level_dir=$(git rev-parse --show-toplevel)` to capture the repository root path.
+2. For each task, determine whether it operates at `top_level_dir` or inside a known submodule under `top_level_dir/<submodule-path>` (the path must exist, typically defined in `.gitmodules`).
+3. Verify that the chosen directory contains an `agent_bins/` folder; if not, adjust the target (tasks must be defined at directories where `agent_bins/` exists).
+4. Set `project-dir` to the absolute path for that directory. Executors and Workers will `cd` there and set `PROJECT_DIR` to the same value before executing commands.
+4. When responding to the user, explicitly state the `tasks.json` path and list each task's `project-dir` so downstream agents configure themselves correctly.
 
 After the user agrees to the plan, create the JSON file with the following exact structure:
 
@@ -231,6 +221,7 @@ After the user agrees to the plan, create the JSON file with the following exact
     {
       "task": "Short, descriptive name of the task",
       "description": "Single-line summary of what needs to be done",
+      "project-dir": "/absolute/path/to/project",
       "steps": [
         {
           "step": 1,
@@ -315,6 +306,17 @@ Each task object MUST conform to these strict rules:
   ]
   ```
 - **When to use**: Populate this field when the task requires 2+ distinct subtasks. Leave as empty array `[]` if the task is atomic.
+
+### `project-dir` Field
+- **Type**: String
+- **Requirement**: Mandatory for every task
+- **Format**: Absolute filesystem path returned by tooling (no `~`, env vars, or relative segments)
+- **Rules**:
+  - Value must equal either `top_level_dir` (captured via `git rev-parse --show-toplevel`) or `top_level_dir/<submodule-path>` where the directory exists (use `.gitmodules` or `git submodule status` to confirm).
+  - The directory referenced by `project-dir` MUST contain an `agent_bins/` folder; tasks cannot target higher levels without this folder.
+  - Executors/Workers MUST `cd project-dir` and export `PROJECT_DIR=project-dir` before running any command.
+  - All Python invocations MUST use `"$PROJECT_DIR/agent_bins/python"` from within that directory.
+  - Tasks that span multiple directories should be split so each one has a single `project-dir`.
 
 ### `acceptance-criteria` Field
 - **Type**: String
@@ -420,6 +422,8 @@ For each task object:
 ☐ description field: Single sentence only (no \n, no multi-step content)
 ☐ description field: Starts with imperative verb (Create, Implement, Add, etc.)
 ☐ description field: 10-200 characters
+☐ project-dir field: Absolute path that exists, equals `top_level_dir` or `top_level_dir/<submodule-path>`, and contains `agent_bins/`
+☐ project-dir field: Commands can `cd project-dir` and export `PROJECT_DIR` to the same path
 ☐ steps field (if present): Array with step numbers starting at 1, incrementing by 1
 ☐ steps field (if present): No step number gaps or duplicates
 ☐ steps field (if present): Each step.description is single sentence (no "and", "then", "or")
@@ -456,6 +460,8 @@ After writing `tasks.json`, perform the following validation:
 - The `skills` array lists relevant skills from the Worker agent (can be empty `[]` if none apply).
 - The `steps` array can be empty `[]` for atomic tasks, or contain 2-15 ordered items when the task requires multiple distinct subtasks.
 - The `test-plan` object MUST exist on every task with all three keys (`unit`, `integration`, `e2e-manual`).
+- Every task includes `project-dir` pointing to an absolute directory under `top_level_dir` that already contains `agent_bins/`; Executors/Workers must `cd project-dir` and set `PROJECT_DIR` to that path before running commands.
+- All Python commands referenced anywhere in the plan must use `"$PROJECT_DIR/agent_bins/python"`.
 - Tasks ordered earlier in the array should have fewer integration tests (they have fewer layers below them).
 - Tasks ordered later should have integration tests that reference specific earlier tasks by name.
 - Only the last task (or a dedicated final task) should have `e2e-manual` items.
