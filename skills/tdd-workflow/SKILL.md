@@ -20,6 +20,7 @@ Core principle: **RED (failing test) -> GREEN (minimal implementation) -> REFACT
 
 At the start of each session, before doing anything else:
 
+- **Determine project directory**: The working directory where code and tests live.
 - List `tdd-summary/` to check for existing step reports (e.g. `step-1.md`, `step-2.md`).
 - If reports exist, read them to understand prior context, then **resume from the next step**.
 
@@ -54,7 +55,7 @@ Write `tdd-summary/step-1.md`:
 
 ## Step 2 - Write Scenario Docs
 
-For each functional requirement, create a scenario document at `docs/scenario/<name>.md`:
+For each functional requirement, create a scenario document at `tdd-summary/docs/scenario/<name>.md`:
 
 ```markdown
 # Scenario: <Title>
@@ -89,7 +90,7 @@ Write `tdd-summary/step-2.md`:
 
 ## Scenario Documents Created
 
-- FR-1: <title> - `docs/scenario/<name>.md`
+- FR-1: <title> - `tdd-summary/docs/scenario/<name>.md`
 - ...
 ```
 
@@ -99,7 +100,7 @@ Write `tdd-summary/step-2.md`:
 
 For each scenario document:
 
-- Write tests at `tests/scenario/test_<name>.py` (or equivalent).
+- Write tests at `test/scenario/test_<name>.py` (or equivalent).
 - Each scenario must have **at least 2 test cases**. Add edge cases if missing.
 - All acceptance criteria from the scenario document must be covered.
 - Tests must **not** be empty or dummy.
@@ -121,7 +122,7 @@ Write `tdd-summary/step-3.md`:
 
 ## Failing Tests Created
 
-- FR-1: <title> - `docs/scenario/<name>.md` - `tests/scenario/test_<name>.py`
+- FR-1: <title> - `tdd-summary/docs/scenario/<name>.md` - `test/scenario/test_<name>.py`
 - ...
 ```
 
@@ -144,7 +145,7 @@ Write `tdd-summary/step-4.md`:
 
 ## Implementations Completed
 
-- FR-1: <title> - `docs/scenario/<name>.md` - Implementation in `<module>`
+- FR-1: <title> - `tdd-summary/docs/scenario/<name>.md` - Implementation in `<module>`
 - ...
 
 All tests now pass. Scenario documents updated.
@@ -169,7 +170,7 @@ Write `tdd-summary/step-5.md`:
 
 ## Refactorings Completed
 
-- FR-1: <title> - `docs/scenario/<name>.md` - <what was improved>
+- FR-1: <title> - `tdd-summary/docs/scenario/<name>.md` - <what was improved>
 - ...
 
 All tests still pass after refactoring. Scenario documents updated.
@@ -219,8 +220,8 @@ Write `tdd-summary/step-7.md`:
 
 - Functional requirements addressed:
     - FR-1: ...
-- Scenario documents: `docs/scenario/...`
-- Test files: `tests/scenario/...`
+- Scenario documents: `tdd-summary/docs/scenario/...`
+- Test files: `test/scenario/...`
 - Implementation complete and all tests passing after refactoring.
 
 ## How to Test
