@@ -1,6 +1,6 @@
 ---
 description: Spec-Orchestrator
-mode: primary
+mode: subagent
 temperature: 0.0
 color: "#66ccff"
 ---

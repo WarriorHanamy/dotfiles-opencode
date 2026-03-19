@@ -9,6 +9,11 @@
                 "apiKey": "{env:Z_AI_API_KEY}"
             }
         },
+        "openrouter": {
+            "options": {
+                "apiKey": "{env:OPENROUTER_API_KEY}"
+            }
+        },
         "bailian-coding-plan": {
             "npm": "@ai-sdk/anthropic",
             "name": "Model Studio Coding Plan",
@@ -34,24 +39,6 @@
                     "budgetTokens": 1024
                     }
                 }
-                },
-                "qwen3-max-2026-01-23": {
-                    "name": "Qwen3 Max 2026-01-23"
-                },
-                "qwen3-coder-next": {
-                    "name": "Qwen3 Coder Next"
-                },
-                "qwen3-coder-plus": {
-                    "name": "Qwen3 Coder Plus"
-                },
-                "MiniMax-M2.5": {
-                    "name": "MiniMax M2.5",
-                    "options": {
-                        "thinking": {
-                        "type": "enabled",
-                        "budgetTokens": 38912
-                        }
-                    }
                 },
                 "glm-5": {
                     "name": "GLM-5",
@@ -92,8 +79,8 @@
             }
         }
     },
-    "model": "bailian-coding-plan/glm-4.7",
-    "small_model": "bailian-coding-plan/qwen3.5-plus",
+    "model": "zhipuai-coding-plan/glm-5",
+    "small_model": "bailian-coding-plan/kimi-k2.5",
     "default_agent": "build",
     "mcp": {
         "zai-mcp-server": {

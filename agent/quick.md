@@ -1,6 +1,6 @@
 ---
 description: Quick
-mode: primary
+mode: subagent
 temperature: 0.0
 model: zhipuai-coding-plan/glm-4.5-air
 ---
