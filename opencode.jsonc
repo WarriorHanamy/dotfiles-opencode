@@ -9,11 +9,6 @@
                 "apiKey": "{env:Z_AI_API_KEY}"
             }
         },
-        "openrouter": {
-            "options": {
-                "apiKey": "{env:OPENROUTER_API_KEY}"
-            }
-        },
         "bailian-coding-plan": {
             "npm": "@ai-sdk/anthropic",
             "name": "Model Studio Coding Plan",
@@ -176,6 +171,9 @@
     ],
     "lsp": {
         "pyright": {
+           "disabled": true
+        },
+        "clangd": {
            "disabled": true
         }
     }
