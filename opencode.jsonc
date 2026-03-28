@@ -6,76 +6,11 @@
     "provider": {
         "zhipuai-coding-plan": {
             "options": {
-                "apiKey": "{env:Z_AI_API_KEY}"
+                "apiKey": "{env:Z_AI_TOKEN}"
             }
         },
-        "bailian-coding-plan": {
-            "npm": "@ai-sdk/anthropic",
-            "name": "Model Studio Coding Plan",
-            "options": {
-            "baseURL": "https://coding.dashscope.aliyuncs.com/apps/anthropic/v1",
-            "apiKey": "{env:ALI_AI_API_KEY}"
-            },
-            "models": {
-                "qwen3.5-plus": {
-                "name": "Qwen3.5 Plus",
-                "modalities": {
-                    "input": [
-                    "text",
-                    "image"
-                ],
-                "output": [
-                    "text"
-                ]
-                },
-                "options": {
-                    "thinking": {
-                    "type": "enabled",
-                    "budgetTokens": 1024
-                    }
-                }
-                },
-                "glm-5": {
-                    "name": "GLM-5",
-                    "options": {
-                        "thinking": {
-                        "type": "enabled",
-                        "budgetTokens": 38912
-                        }
-                    }
-                },
-                "glm-4.7": {
-                    "name": "GLM-4.7",
-                    "options": {
-                        "thinking": {
-                        "type": "enabled",
-                        "budgetTokens": 38912
-                        }
-                    }
-                },
-                "kimi-k2.5": {
-                    "name": "Kimi K2.5",
-                    "modalities": {
-                        "input": [
-                        "text",
-                        "image"
-                        ],
-                        "output": [
-                        "text"
-                        ]
-                    },
-                    "options": {
-                        "thinking": {
-                        "type": "enabled",
-                        "budgetTokens": 38912
-                        }
-                    }
-                }
-            }
-        }
-    },
     "model": "zhipuai-coding-plan/glm-5",
-    "small_model": "bailian-coding-plan/kimi-k2.5",
+    "small_model": "zhipuai-coding-plan-coding-plan/glm-4.7",
     "default_agent": "build",
     "mcp": {
         "zai-mcp-server": {
@@ -87,7 +22,7 @@
             ],
             "environment": {
                 "Z_AI_MODE": "ZHIPU",
-                "Z_AI_API_KEY": "{env:Z_AI_API_KEY}"
+                "Z_AI_API_KEY": "{env:Z_AI_TOKEN}"
             },
             "enabled": false,
         },
@@ -95,7 +30,7 @@
             "type": "remote",
             "url": "https://open.bigmodel.cn/api/mcp/web_search_prime/mcp",
             "headers": {
-                "Authorization": "Bearer {env:Z_AI_API_KEY}"
+                "Authorization": "Bearer {env:Z_AI_TOKEN}"
             },
             "enabled": false,
         },
@@ -103,7 +38,7 @@
             "type": "remote",
             "url": "https://open.bigmodel.cn/api/mcp/web_reader/mcp",
             "headers": {
-                "Authorization": "Bearer {env:Z_AI_API_KEY}"
+                "Authorization": "Bearer {env:Z_AI_TOKEN}"
             },
             "enabled": true,
         },
@@ -111,7 +46,7 @@
             "type": "remote",
             "url": "https://open.bigmodel.cn/api/mcp/zread/mcp",
             "headers": {
-                "Authorization": "Bearer {env:Z_AI_API_KEY}"
+                "Authorization": "Bearer {env:Z_AI_TOKEN}"
             },
             "enabled": false,
         },
@@ -130,7 +65,7 @@
                 "-y",
                 "@upstash/context7-mcp",
                 "--api-key",
-                "{env:CONTEXT7_API_KEY}"
+                "{env:CONTEXT7_TOKEN}"
             ],
             "enabled": true,
         },
