@@ -8,7 +8,7 @@
             "npm": "@ai-sdk/openai-compatible",
             "name": "MiMo",
             "options": {
-                "baseURL": "https://token-plan-cn.xiaomimimo.com/anthropic",
+                "baseURL": "https://token-plan-cn.xiaomimimo.com/v1",
                 "apiKey": "{env:XIAOMI_TOKEN}"
             },
             "models": {
