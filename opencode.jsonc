@@ -4,6 +4,31 @@
         "mcp_timeout": 120000
     },
     "provider": {
+        "mimo": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "MiMo",
+            "options": {
+                "baseURL": "https://token-plan-cn.xiaomimimo.com/anthropic",
+                "apiKey": "{env:XIAOMI_TOKEN}"
+            },
+            "models": {
+                "mimo-v2-pro": {
+                    "name": "MiMo-V2-Pro",
+                    "limit": {
+                        "context": 1048576,
+                        "output": 131072
+                    },
+                    "modalities": {
+                        "input": [
+                            "text"
+                        ],
+                        "output": [
+                            "text"
+                        ]
+                    }
+                }
+            }
+        },
         "zhipuai-coding-plan": {
             "options": {
                 "apiKey": "{env:Z_AI_TOKEN}"
@@ -15,7 +40,7 @@
             }
         },
     },
-    "model": "deepseek/deepseek-reasoner",
+    "model": "mimo/mimo-v2-pro",
     // "model": "zhipuai-coding-plan/glm-5",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
@@ -23,10 +48,10 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "zhipuai-coding-plan/glm-5.1"
+            "model": "mimo/mimo-v2-pro"
         },
         "plan": {
-            "model": "deepseek/deepseek-reasoner"
+            "model": "mimo/mimo-v2-pro"
         }
     },
     "mcp": {
