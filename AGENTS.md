@@ -23,8 +23,6 @@
 
 - Existing projects follow repository style configs and local patterns.
 - Fresh projects use 2-space indentation by default.
-- Python workflows must use `$PROJECT_DIR/agent_bins/python` (or `./agent_bins/python`)
-  when available; do not use bare `python`.
 
 ## Workspace Hygiene
 
@@ -37,6 +35,11 @@
 - `pty_*` tools are used for commands likely to exceed 2 minutes.
 - `pty_*` tools are used for background or interactive long-lived processes.
 - If a normal shell command reaches timeout, continue with PTY execution.
+
+## System Environment
+
+- Host system: Arch Linux with Hyprland (Wayland).
+- For ROS/PX4 projects, always use Docker containers to ensure environment consistency.
 
 ## Stateless Reliability
 

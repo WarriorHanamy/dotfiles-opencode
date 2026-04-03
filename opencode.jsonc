@@ -9,9 +9,26 @@
                 "apiKey": "{env:Z_AI_TOKEN}"
             }
         },
-    "model": "zhipuai-coding-plan/glm-5",
+        "deepseek": {
+            "options": {
+                "apiKey": "{env:DEEPSEEK_TOKEN}"
+            }
+        },
+    },
+    "model": "deepseek/deepseek-reasoner",
+    // "model": "zhipuai-coding-plan/glm-5",
+    // "model": "deepseek/deepseek-reasoner",
+    // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
     "small_model": "zhipuai-coding-plan-coding-plan/glm-4.7",
     "default_agent": "build",
+    "agent": {
+        "build": {
+            "model": "zhipuai-coding-plan/glm-5.1"
+        },
+        "plan": {
+            "model": "deepseek/deepseek-reasoner"
+        }
+    },
     "mcp": {
         "zai-mcp-server": {
             "type": "local",
