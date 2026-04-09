@@ -29,6 +29,26 @@
                 }
             }
         },
+        "stp-flash": {
+            "npm": "@ai-sdk/openai-compatible",
+            "options": {
+                "baseURL": "https://api.stepfun.com/v1",
+                "apiKey": "{env:STP_FLASH_TOKEN}"
+            },
+            "models": {
+                "step-3.5-flash-2603": {
+                    "name": "Step-3.5-Flash-2603",
+                    "limit": {
+                        "context": 131072,
+                        "output": 131072
+                    },
+                    "modalities": {
+                        "input": ["text"],
+                        "output": ["text"]
+                    }
+                }
+            }
+        },
         "zhipuai-coding-plan": {
             "options": {
                 "apiKey": "{env:Z_AI_TOKEN}"
@@ -48,7 +68,7 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "mimo/mimo-v2-pro"
+            "model": "stp-flash/step-3.5-flash-2603"
         },
         "plan": {
             "model": "mimo/mimo-v2-pro"

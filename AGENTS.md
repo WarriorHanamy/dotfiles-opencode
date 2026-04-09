@@ -45,3 +45,8 @@
 
 - Instructions stay compact, explicit, and scenario-oriented.
 - Cleanup criteria are rule-based instead of intuition-based.
+
+## FastDDS Schema Reference
+
+- FastDDS XML configuration schema: https://fast-dds.docs.eprosima.com/en/v2.6.11/fastdds/xml_configuration/transports.html
+- Version: 2.6.11
