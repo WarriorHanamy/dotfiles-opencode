@@ -9,7 +9,7 @@ Prefer project-local execution and predictable tooling.
 
 ## Runtime Rule
 
-- Always use `$PROJECT_DIR/agent_bins/python` (or `./agent_bins/python`) when available.
+- Always use `$PROJECT_DIR/.agent/bin/python` (or `./.agent/bin/python`) when available.
 - Do not use bare `python`.
 
 ## Quick Start
@@ -19,7 +19,6 @@ Prefer project-local execution and predictable tooling.
 Use a clear script header and keep dependencies minimal.
 
 ```python
-#!/usr/bin/env python3
 """Script description and usage examples."""
 
 import sys
@@ -27,14 +26,14 @@ import sys
 Run with:
 
 ```bash
-$PROJECT_DIR/agent_bins/python script.py --help
+$PROJECT_DIR/.agent/bin/python script.py --help
 ```
 
 ### Multi-File Projects
 
 ```bash
 # Run script
-$PROJECT_DIR/agent_bins/python script.py
+$PROJECT_DIR/.agent/bin/python script.py
 ```
 
 ## Development Tools
@@ -44,10 +43,10 @@ From `/test` directory:
 ```bash
 cd test
 
-$PROJECT_DIR/agent_bins/python -m pytest
-$PROJECT_DIR/agent_bins/python -m pyright
-$PROJECT_DIR/agent_bins/python -m ruff check ../.opencode/skill
-$PROJECT_DIR/agent_bins/python -m ruff format ../.opencode/skill
+$PROJECT_DIR/.agent/bin/python -m pytest
+$PROJECT_DIR/.agent/bin/python -m pyright
+$PROJECT_DIR/.agent/bin/python -m ruff check ../.opencode/skill
+$PROJECT_DIR/.agent/bin/python -m ruff format ../.opencode/skill
 ```
 
 ## Script Development Workflow

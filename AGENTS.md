@@ -23,12 +23,14 @@
 
 - Existing projects follow repository style configs and local patterns.
 - Fresh projects use 2-space indentation by default.
+- **Tool preference**: Use `edit` for in-place modifications; use `write` only for new files or when replacing entire content. Avoid large `write` operations that may time out.
 
 ## Workspace Hygiene
 
 - Keep workspace clean and keep temporary analysis scripts in `/tmp`.
 - Maintain `.gitignore` so generated files stay out of version control.
 - Empty project bootstrap can use the `setup-fresh-project` skill.
+- If the project contains a Makefile, prefer to read it to understand task pipelines and project conventions.
 
 ## Long-Running Tasks
 
@@ -50,3 +52,9 @@
 
 - FastDDS XML configuration schema: https://fast-dds.docs.eprosima.com/en/v2.6.11/fastdds/xml_configuration/transports.html
 - Version: 2.6.11
+
+## Memory Echoes
+
+- When the user uses keywords like "modifications", "worktree", "stash", "patch", "rebase", or "branch", use `git -C <path>` to check the repository state and understand the intent.
+- Identify the correct git worktree or repository location before taking actions.
+- Use `git -C status`, `git -C log --oneline -5`, or `git -C branch -a` to orient yourself.
