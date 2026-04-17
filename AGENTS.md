@@ -50,7 +50,7 @@
 
 ## FastDDS Schema Reference
 
-- FastDDS XML configuration schema: https://fast-dds.docs.eprosima.com/en/v2.6.11/fastdds/xml_configuration/transports.html
+- FastDDS XML configuration schema: <https://fast-dds.docs.eprosima.com/en/v2.6.11/fastdds/xml_configuration/transports.html>
 - Version: 2.6.11
 
 ## Memory Echoes
@@ -58,3 +58,8 @@
 - When the user uses keywords like "modifications", "worktree", "stash", "patch", "rebase", or "branch", use `git -C <path>` to check the repository state and understand the intent.
 - Identify the correct git worktree or repository location before taking actions.
 - Use `git -C status`, `git -C log --oneline -5`, or `git -C branch -a` to orient yourself.
+
+## Preference
+
+Never tends to be backward-compatible
+Never tends to be create many fallback paths

@@ -36,8 +36,8 @@
                 "apiKey": "{env:STP_FLASH_TOKEN}"
             },
             "models": {
-                "step-3.5-flash-2603": {
-                    "name": "Step-3.5-Flash-2603",
+                "step-3.5-flash": {
+                    "name": "Step-3.5-Flash",
                     "limit": {
                         "context": 131072,
                         "output": 131072
@@ -68,7 +68,7 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "stp-flash/step-3.5-flash-2603"
+            "model": "stp-flash/step-3.5-flash"
         },
         "plan": {
             "model": "mimo/mimo-v2-pro"
