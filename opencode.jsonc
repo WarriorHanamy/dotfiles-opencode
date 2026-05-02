@@ -26,6 +26,21 @@
                             "text"
                         ]
                     }
+                },
+                "mimo-v2.5-pro": {
+                    "name": "MiMo-V2.5-Pro",
+                    "limit": {
+                        "context": 1048576,
+                        "output": 131072
+                    },
+                    "modalities": {
+                        "input": [
+                            "text"
+                        ],
+                        "output": [
+                            "text"
+                        ]
+                    }
                 }
             }
         },
@@ -47,79 +62,59 @@
                         "output": ["text"]
                     }
                 }
-            }
-        },
-        "zhipuai-coding-plan": {
-            "options": {
-                "apiKey": "{env:Z_AI_TOKEN}"
-            }
-        },
+             }
+         },
         "deepseek": {
+            "npm": "@ai-sdk/openai-compatible",
             "options": {
+                "baseURL": "https://api.deepseek.com",
                 "apiKey": "{env:DEEPSEEK_TOKEN}"
+            },
+            "models": {
+                "deepseek-v4-flash": {
+                    "name": "DeepSeek-V4-Flash",
+                    "limit": {
+                        "context": 1048576,
+                        "output": 131072
+                    },
+                    "modalities": {
+                        "input": ["text"],
+                        "output": ["text"]
+                    }
+                },
+                "deepseek-v4-pro": {
+                    "name": "DeepSeek-V4-Pro",
+                    "limit": {
+                        "context": 1048576,
+                        "output": 131072
+                    },
+                    "modalities": {
+                        "input": ["text"],
+                        "output": ["text"]
+                    }
+                }
             }
-        },
+        }
     },
-    "model": "mimo/mimo-v2-pro",
-    // "model": "zhipuai-coding-plan/glm-5",
+    "model": "mimo/mimo-v2.5-pro",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
-    "small_model": "zhipuai-coding-plan-coding-plan/glm-4.7",
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "stp-flash/step-3.5-flash"
+            "model": "deepseek/deepseek-v4-pro"
         },
         "plan": {
-            "model": "mimo/mimo-v2-pro"
+            "model": "deepseek/deepseek-v4-pro"
+        },
+        "explore": {
+            "model": "deepseek/deepseek-v4-flash",
+            "thinking": {
+                "type": "disabled"
+            }
         }
     },
     "mcp": {
-        "zai-mcp-server": {
-            "type": "local",
-            "command": [
-                "npx",
-                "-y",
-                "@z_ai/mcp-server"
-            ],
-            "environment": {
-                "Z_AI_MODE": "ZHIPU",
-                "Z_AI_API_KEY": "{env:Z_AI_TOKEN}"
-            },
-            "enabled": false,
-        },
-        "web-search-prime": {
-            "type": "remote",
-            "url": "https://open.bigmodel.cn/api/mcp/web_search_prime/mcp",
-            "headers": {
-                "Authorization": "Bearer {env:Z_AI_TOKEN}"
-            },
-            "enabled": false,
-        },
-        "web-reader": {
-            "type": "remote",
-            "url": "https://open.bigmodel.cn/api/mcp/web_reader/mcp",
-            "headers": {
-                "Authorization": "Bearer {env:Z_AI_TOKEN}"
-            },
-            "enabled": true,
-        },
-        "zread": {
-            "type": "remote",
-            "url": "https://open.bigmodel.cn/api/mcp/zread/mcp",
-            "headers": {
-                "Authorization": "Bearer {env:Z_AI_TOKEN}"
-            },
-            "enabled": false,
-        },
-        "playwright": {
-            "type": "local",
-            "command": [
-                "npx",
-                "@playwright/mcp@latest"
-            ],
-            "enabled": false,
-        },
         "context7": {
             "type": "local",
             "command": [

@@ -1,7 +1,7 @@
 ---
 description: Plan mode agent (planx). Disallows all edit tools.
 mode: primary
-model: mimo/mimo-v2-pro
+model: deepseek/deepseek-v4-pro
 temperature: 0.7
 color: "#3a86ff"
 ---

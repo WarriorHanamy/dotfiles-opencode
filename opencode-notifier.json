@@ -1,13 +1,13 @@
 {
   "sound": false,
-  "notification": false,
+  "notification": true,
   "timeout": 2,
   "showProjectName": true,
-  "notificationSystem": "osascript",
+  "notificationSystem": "notify-send",
   "command": {
       "enabled": true,
       "path": "/usr/bin/bash",
-      "args": ["-c", "test {message} != subagent_complete && dunstify -u low -a opencode $PWD {message}"],
+      "args": ["-c", "test \"{message}\" != subagent_complete && notify-send -a opencode -u low 'opencode' \"{message}\""],
       "minDuration": 1
   },
   "messages": {

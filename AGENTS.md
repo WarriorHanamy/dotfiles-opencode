@@ -48,11 +48,6 @@
 - Instructions stay compact, explicit, and scenario-oriented.
 - Cleanup criteria are rule-based instead of intuition-based.
 
-## FastDDS Schema Reference
-
-- FastDDS XML configuration schema: <https://fast-dds.docs.eprosima.com/en/v2.6.11/fastdds/xml_configuration/transports.html>
-- Version: 2.6.11
-
 ## Memory Echoes
 
 - When the user uses keywords like "modifications", "worktree", "stash", "patch", "rebase", or "branch", use `git -C <path>` to check the repository state and understand the intent.
@@ -61,5 +56,32 @@
 
 ## Preference
 
+See the Makefile if it exists
+
 Never tends to be backward-compatible
 Never tends to be create many fallback paths
+
+## Engineering-Focused Comment Style
+
+Use Doxygen block comments (`/** ... */`) for C/C++ code with physical or mathematical semantics.
+
+### Format
+
+```cpp
+/**
+ * Single-sentence description of the function's physical meaning.
+ *
+ * @param[in] name  Description with unit [m/s]
+ * @return Description with unit [m/s]
+ */
+```
+
+### Rules
+
+- Comments must be placed **before** the class/function definition, not after.
+- One sentence description, no `@brief` tag.
+- Every `@param` must include direction (`[in]`/`[out]`/`[inout]`) and unit in square brackets.
+- `@return` must include unit.
+- Total doc block: 4-6 lines max.
+- Inline `//` comments inside function bodies: only for non-obvious physical or mathematical reasoning, not for explaining code syntax, single line.
+- Block /*..*/ comments is to clarify the intention, the purpose.

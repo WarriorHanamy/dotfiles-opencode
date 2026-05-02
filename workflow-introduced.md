@@ -222,6 +222,7 @@ TESTING RESULTS:
 **User Request**: "Build a SPH fluid simulation web application"
 
 **Brainstorm Agent**:
+
 1. Clarifies: What physics properties? What visualization? What UI controls?
 2. Researches: SPH algorithms, WebGL rendering options
 3. Decomposes into dependency layers:
