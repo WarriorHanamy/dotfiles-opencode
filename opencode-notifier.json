@@ -4,17 +4,17 @@
   "timeout": 2,
   "showProjectName": true,
   "notificationSystem": "notify-send",
-  "command": {
-      "enabled": true,
-      "path": "/usr/bin/bash",
-      "args": ["-c", "test \"{message}\" != subagent_complete && notify-send -a opencode -u low 'opencode' \"{message}\""],
-      "minDuration": 1
-  },
-  "messages": {
-    "permission": "Action required",
-    "complete": "Done!",
-    "subagent_complete": "Subagent complete",
-    "error": "Something went wrong",
-    "question": "Input needed"
-  }
+    "command": {
+        "enabled": true,
+        "path": "/usr/bin/bash",
+        "args": ["-c", "PID=$$; while [ \"$PID\" -ne 1 ]; do if hyprctl clients -j | jq -e --argjson pid \"$PID\" '.[] | select(.pid == $pid)' >/dev/null 2>&1; then break; fi; PID=$(ps -o ppid= -p \"$PID\" | tr -d ' '); done; WS=$(hyprctl clients -j | jq -r --argjson pid \"$PID\" '.[] | select(.pid == $pid) | .workspace.name // .workspace.id'); test \"{event}\" != subagent_complete && notify-send -a opencode -u low \"[WS${WS}] $(basename \"$PWD\")\" \"{message}\""],
+        "minDuration": 1
+    },
+    "messages": {
+        "permission": "Permission needed",
+        "complete": "Task completed",
+        "subagent_complete": "Subagent complete",
+        "error": "Error occurred",
+        "question": "Input required"
+    }
 }
