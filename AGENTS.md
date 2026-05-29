@@ -22,7 +22,7 @@
 ## Coding and Style
 
 - Existing projects follow repository style configs and local patterns.
-- Fresh projects use 2-space indentation by default.
+- Fresh projects use 4-space indentation by default.
 - **Tool preference**: Use `edit` for in-place modifications; use `write` only for new files or when replacing entire content. Avoid large `write` operations that may time out.
 
 ## Workspace Hygiene
