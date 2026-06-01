@@ -34,7 +34,11 @@ Prefer:
 3. Code, config, scripts, and tests as the single source of truth.
 4. PlantUML diagrams over long architecture prose.
 5. Deleting stale prose over rewriting it.
-6. Source anchors under every diagram.
+6. Source anchors under every diagram as Markdown after the closing code fence:
+   ```md
+   **Source anchors:**
+   - `path/to/source` — what it anchors
+   ```
 
 ## Step 1: Launch 6 Fast Audit Agents In Parallel
 
@@ -78,7 +82,7 @@ Produce PlantUML diagrams:
 - Data-flow diagram — ROS topics, sockets, IPC
 - State machine diagram — mode/lifecycle logic from source
 
-Every diagram MUST include source anchors below it.
+Every diagram MUST include source anchors below it as Markdown (after the closing code fence, NOT as PlantUML comments inside the fence).
 
 ### Agent 4: Code-Embedded Docs Opportunities
 
