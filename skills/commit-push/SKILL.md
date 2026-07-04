@@ -17,19 +17,29 @@ git status && git diff HEAD && git diff --staged
 
 If no changes exist, report and stop.
 
-### 2. Handle submodules
+### 2. Submodule hygiene check
 
-Check for `.gitmodules`. For each submodule with uncommitted changes:
+Before committing, detect submodule problems. Run these checks in parallel:
 
 ```bash
-git -C <submodule-path> add -A
-git -C <submodule-path> commit -F- <<'EOF'
-<conventional-commit-message>
-EOF
-git -C <submodule-path> push
+# List submodules with uncommitted changes (modified/untracked inside them)
+git submodule foreach --quiet \
+  'if [ -n "$(git status --porcelain)" ]; then echo "DIRTY (uncommitted): $sm_path"; fi'
+
+# Detect staged submodule pointers that reference dirty commits
+git diff --cached --submodule=diff | grep '\-dirty' || true
+
+# Detect unstaged submodule pointers that reference dirty commits
+git diff HEAD --submodule=diff | grep '\-dirty' || true
 ```
 
-Process submodules sequentially before the parent repo.
+**If any submodule is dirty or a `-dirty` reference exists → ABORT.**  
+Report the offending submodules to the user and ask:
+
+1. "Commit submodule changes first?" – user provides a message, commit inside each dirty submodule, then retry hygiene check
+2. "Skip and force?" – not recommended, but proceed if user insists
+
+**Never auto-commit submodule changes.** The user must explicitly approve.
 
 ### 3. Branch decision
 
@@ -94,7 +104,8 @@ rounded up instead of truncating.
 ## Rules
 
 - The commit and push tool calls must be issued together in a single message.
-- Submodule commits go before the parent repo commit.
+- Submodule commits go before the parent repo commit.  
+- Never push commits where submodule pointers reference `-dirty` state.
 - Never create a branch unless the user explicitly asks for one.
 - Subject line: imperative mood, ≤50 characters, no trailing period.
 - Body: prose paragraph, no lists or templates.

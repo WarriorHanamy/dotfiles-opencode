@@ -1,5 +1,7 @@
 # Agent Operating Profile
 
+> The full content below is already in your system prompt. Read or create project-level AGENTS.md instead.
+
 ## Language and Output
 
 - Replies are primarily in Chinese; English is used for unclear wording and technical terms.

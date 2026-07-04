@@ -102,7 +102,7 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "deepseek/deepseek-v4-pro"
+            "model": "deepseek/deepseek-v4-flash"
         },
         "plan": {
             "model": "deepseek/deepseek-v4-pro"

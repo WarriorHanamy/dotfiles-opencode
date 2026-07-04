@@ -5,6 +5,14 @@ opencode() {
     export SHELL=$(which bash)
     export OPENCODE_ENABLE_EXA=1
     export AGENT_BROWSER_SESSION=$session_random_key
+
+    if [ "${1:-}" = "push" ]; then
+        shift
+        local prompt="Use the commit-push skill to stage all changes, generate a conventional commit message, and push to origin."
+        [ $# -gt 0 ] && prompt="$prompt Context: $*"
+        exec command opencode run --dangerously-skip-permissions "$prompt"
+    fi
+
     command opencode "$@"
 }
 

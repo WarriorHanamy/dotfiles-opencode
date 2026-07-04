@@ -9,7 +9,7 @@ description: Use when creating new skills, editing existing skills, or verifying
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
 
-**Personal skills live in agent-specific directories (`~/.claude/skills` for Claude Code, `~/.agents/skills/` for Codex)** 
+**Always write skills to `<project>/.agents/skills/` (auto-discovered). Only write to `~/.config/opencode/skills/` if the user explicitly requests a global/cross-project skill.**
 
 You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
 
@@ -69,11 +69,23 @@ Way of thinking about problems (flatten-with-flags, test-invariants)
 ### Reference
 API docs, syntax guides, tool documentation (office docs)
 
-## Directory Structure
+## Skill Location
 
+When creating a skill, choose the target directory based on scope:
+
+| Priority | Scope | Path | Discovery |
+|----------|-------|------|-----------|
+| **1 (default)** | Project skill | `<project>/.agents/skills/<name>/` | OpenCode walk-up scan |
+| **2 (only if asked)** | Global skill | `~/.config/opencode/skills/<name>/` | OpenCode plugin scan |
+| — | Claude Code compat | `~/.claude/skills/<name>/` | OpenCode external scan |
+| — | Codex compat | `~/.agents/skills/<name>/` | OpenCode external scan |
+
+**Rule:** Always default to `<project>/.agents/skills/`. Only write to `~/.config/opencode/skills/` when the user explicitly requests a globally-available (cross-project) skill. Do not guess — ask if unsure.
+
+### Directory Layout
 
 ```
-skills/
+<target-dir>/
   skill-name/
     SKILL.md              # Main reference (required)
     supporting-file.*     # Only if needed
@@ -629,8 +641,10 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 - [ ] Supporting files only for tools or heavy reference
 
 **Deployment:**
+- [ ] Verify skill placed at correct location (project `.agents/skills/` vs global `~/.config/opencode/skills/`)
 - [ ] Commit skill to git and push to your fork (if configured)
 - [ ] Consider contributing back via PR (if broadly useful)
+- [ ] Remind user to restart opencode session if project-level skill was added
 
 ## Discovery Workflow
 
