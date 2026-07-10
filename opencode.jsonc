@@ -12,21 +12,6 @@
                 "apiKey": "{env:XIAOMI_TOKEN}"
             },
             "models": {
-                "mimo-v2-pro": {
-                    "name": "MiMo-V2-Pro",
-                    "limit": {
-                        "context": 1048576,
-                        "output": 131072
-                    },
-                    "modalities": {
-                        "input": [
-                            "text"
-                        ],
-                        "output": [
-                            "text"
-                        ]
-                    }
-                },
                 "mimo-v2.5-pro": {
                     "name": "MiMo-V2.5-Pro",
                     "limit": {
@@ -44,26 +29,7 @@
                 }
             }
         },
-        "stp-flash": {
-            "npm": "@ai-sdk/openai-compatible",
-            "options": {
-                "baseURL": "https://api.stepfun.com/v1",
-                "apiKey": "{env:STP_FLASH_TOKEN}"
-            },
-            "models": {
-                "step-3.5-flash": {
-                    "name": "Step-3.5-Flash",
-                    "limit": {
-                        "context": 131072,
-                        "output": 131072
-                    },
-                    "modalities": {
-                        "input": ["text"],
-                        "output": ["text"]
-                    }
-                }
-             }
-         },
+
         "deepseek": {
             "npm": "@ai-sdk/openai-compatible",
             "options": {
@@ -96,7 +62,7 @@
             }
         }
     },
-    "model": "mimo/mimo-v2.5-pro",
+    "model": "deepseek/deepseek-v4-flash",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
     "default_agent": "build",

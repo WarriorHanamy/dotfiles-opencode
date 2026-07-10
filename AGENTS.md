@@ -26,6 +26,7 @@
 - Existing projects follow repository style configs and local patterns.
 - Fresh projects use 4-space indentation by default.
 - **Tool preference**: Use `edit` for in-place modifications; use `write` only for new files or when replacing entire content. Avoid large `write` operations that may time out.
+- **ROS verification**: Always invoke `pi-verifier` after writing code for ROS projects.
 
 ## Workspace Hygiene
 
@@ -45,6 +46,54 @@
 - Host system: Arch Linux with Hyprland (Wayland).
 - For ROS/PX4 projects, always use Docker containers to ensure environment consistency.
 
+## pi-verifier
+
+- Location: `~/.pi/agent/bin/pi-verifier`
+- Must be in PATH (`~/.pi/agent/bin`) — already added via `.bashrc`.
+- Invoke after every ROS `.cpp` / `.hpp` write or edit.
+- Usage:
+  ```bash
+  git diff HEAD -- path/to/changed/files... | pi-verifier <PROJECT_ROOT>
+  ```
+- PROJECT_ROOT is the only required argument. Pipe `git diff` for changed content.
+- If `"blocked":true`, AGENTS.md at PROJECT_ROOT lacks a proper `## Build commands` section.
+- If `"blocked":false`, the `"item"` hints are sufficient guidance. Address required items, then move on — **do not rerun** pi-verifier after fixing hinted items.
+- Hints from the first run are the canonical feedback; rerunning produces no new info for non-blocked cases.
+
+## System Prompts (not skills)
+
+Skills that use NO tools (read-only classifiers, build runners) belong under
+`~/.pi/agent/system_prompts/<name>/system-prompt.md` and are loaded via
+`--append-system-prompt`.  They are NOT listed in `pi config` TUI and do NOT
+appear in the model's tool selection.
+
+| Directory | Command | Purpose |
+|-----------|---------|---------|
+| `system_prompts/verify-build/` | `--append-system-prompt` | ROS code change verifier (pi-verifier) |
+| `system_prompts/docker-build/` | `--append-system-prompt` | Docker build + push to local registry |
+
+## Python Environment
+
+- **Never use bare `python` or `python3`.** Always invoke via `uv run python`.
+- The global uv-managed Python (3.13, set by `~/.python-version`) is the default for all one-off scripts and project entrypoints.
+- One-off scripts in `/tmp` or workspace use `uv run --script <file>` with PEP 723 inline dependency metadata (`# /// script`).
+- Project scripts use `uv run <entrypoint>` defined in `[project.scripts]`.
+- `uv run <tool>` for linters/formatters (ruff, mypy, etc.).
+- System Python (`/usr/bin/python3`) is **only** for Docker/ROS containers.
+
+## Docker Build Debugging
+
+When building Docker images iteratively (resolving missing deps, fixing compile errors):
+
+- **Split `RUN apt-get` into semantic layers** (base tools → build tools → system libs → runtime → debug tools → project deps). Each layer caches independently; adding a new package only rebuilds the affected layer.
+- **Layer ordering by volatility**: stable layers first, volatile layers last. ROS/noetic deps go in the **last** `RUN apt-get` layer (just before COPY/compile) because they change most often during debugging. Debug tools go second-to-last (one-time addition, stable).
+- **Pattern**: build → read error → add missing package to the thinnest valid layer → rebuild. Never append to an existing monolithic `RUN apt-get`.
+- **APT cleanup**: every `RUN apt-get install` ends with `&& rm -rf /var/lib/apt/lists/*` to avoid bloating intermediate layers.
+- **Build command**: `DOCKER_BUILDKIT=0 docker compose build <service>` (disable BuildKit to use local image cache when Docker Hub is unreachable).
+- **Entrypoint shell**: use `.` not `source` in Dockerfile `RUN` (dash/sh); use `bash -c` when sourcing ROS `setup.bash` (bash-isms).
+- **Container naming**: `{domain}-{phase}-{id}` where id = git sha (CI) or timestamp (local).
+- **ROS dependency scanning**: union of `package.xml` tags + `CMakeLists.txt` `find_package(catkin COMPONENTS ...)`. Many projects have mismatches — conservative union is safest. See `write-dockerfile` skill.
+
 ## Stateless Reliability
 
 - Instructions stay compact, explicit, and scenario-oriented.
@@ -55,6 +104,10 @@
 - When the user uses keywords like "modifications", "worktree", "stash", "patch", "rebase", or "branch", use `git -C <path>` to check the repository state and understand the intent.
 - Identify the correct git worktree or repository location before taking actions.
 - Use `git -C status`, `git -C log --oneline -5`, or `git -C branch -a` to orient yourself.
+
+## Cross-Repo Operations
+
+- When operating across repositories, first read `<target-repo>/AGENTS.md` to understand its conventions, build system, and project-specific rules.
 
 ## Preference
 

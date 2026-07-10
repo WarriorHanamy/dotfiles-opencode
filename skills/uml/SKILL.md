@@ -96,3 +96,43 @@ ec2 --> rds
 rds --> legacy
 @enduml
 ```
+
+## Linting PlantUML Diagrams
+
+### Quick Lint
+
+```bash
+# Heuristic checks only (fast, local)
+bash ~/.config/opencode/skills/uml/lint-plantuml.sh docs/compare/
+
+# Full remote API validation (slower, comprehensive)
+bash ~/.config/opencode/skills/uml/lint-plantuml.sh --remote docs/compare/
+
+# Via bun
+bun run docs:lint
+```
+
+Exit code 0 = clean. Exit code 1 = issues found.
+
+### Common Errors & Fixes
+
+| Error Pattern | Symptom | Fix |
+|---------------|---------|-----|
+| `skinparam rectangle { RoundCorner N; Padding M }` | `Syntax Error? (Assumed diagram type: class)` | Replace with `skinparam roundCorner N`. The `{ }` block is **NOT** supported in component diagrams. |
+| `diamond "OR" as X` | `Syntax Error? (Assumed diagram type: component)` | Diamond shape is not supported in current PlantUML server. Use `rectangle "OR" as X #FFF2CC` instead. |
+| `state UNKNOWN as UNK` | `Syntax Error? (Assumed diagram type: state)` | `UNKNOWN` is a reserved keyword. Use `state "UNKNOWN" as UNK` or `state UNK` directly (implicit). |
+| `"A" + "B" --> "C"` | `Syntax Error? (Assumed diagram type: class)` | `+` combining arrows is not valid in component/class diagrams. Use two separate arrows: `A --> C` then `B --> C`. |
+| Double `as` alias | `rectangle "name" as X as X` | Accidental duplicate from bad edit. Check git diff before committing. |
+| Dangling alias reference | Arrow targets undefined alias | Every `as ALIAS` declaration must be referenced by at least one arrow or note. |
+
+### Supported Diagram Types for Each Lint Rule
+
+The heuristic checker inspects all diagram types. The remote validator sends each block to the public PlantUML API (`plantuml.com`) and checks for `Syntax Error` in the returned SVG.
+
+### CI Integration
+
+The lint is wired into `package.json` as the `docs:lint` script. Run it before `docs:build`:
+
+```bash
+bun run docs:lint && bun run docs:build
+```

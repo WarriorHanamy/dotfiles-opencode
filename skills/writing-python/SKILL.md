@@ -9,45 +9,21 @@ Prefer project-local execution and predictable tooling.
 
 ## Runtime Rule
 
-- Always use `$PROJECT_DIR/.agent/bin/python` (or `./.agent/bin/python`) when available.
-- Do not use bare `python`.
+- **Never use bare `python` or `python3`.** Always `uv run python`.
+- System Python (`/usr/bin/python3*`) is reserved for Docker/ROS — do not invoke it directly.
+- If `uv run python` fails (no uv-managed Python), create one: `uv python install 3.13`.
+- The default Python version is set by `~/.python-version` (user-global).
 
-## Quick Start
+### Invocation patterns
 
-### Single-File Scripts
-
-Use a clear script header and keep dependencies minimal.
-
-```python
-"""Script description and usage examples."""
-
-import sys
-```
-Run with:
-
-```bash
-$PROJECT_DIR/.agent/bin/python script.py --help
-```
-
-### Multi-File Projects
-
-```bash
-# Run script
-$PROJECT_DIR/.agent/bin/python script.py
-```
-
-## Development Tools
-
-From `/test` directory:
-
-```bash
-cd test
-
-$PROJECT_DIR/.agent/bin/python -m pytest
-$PROJECT_DIR/.agent/bin/python -m pyright
-$PROJECT_DIR/.agent/bin/python -m ruff check ../.opencode/skill
-$PROJECT_DIR/.agent/bin/python -m ruff format ../.opencode/skill
-```
+| Scenario                              | Command                     |
+| ------------------------------------- | --------------------------- |
+| Project script (has pyproject.toml)   | `uv run <script>`             |
+| One-off script (no project)           | `uv run --script /tmp/foo.py` |
+| Quick REPL / inline                   | `uv run python -c "..."`      |
+| Linting                               | `uv run ruff check .`         |
+| Type checking                         | `uv run mypy .`               |
+| Docker container scripts (ROS/Noetic) | `python3 /path/script.py`     |
 
 ## Script Development Workflow
 
