@@ -1,0 +1,4 @@
+interface:
+  display_name: "Writing tmux"
+  short_description: "Stable tmux target writing guide"
+  default_prompt: "Use $writing-tmux to drive tmux sessions with stable session, window, and pane targets."

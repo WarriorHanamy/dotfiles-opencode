@@ -112,8 +112,9 @@
     "permission": {
         "external_directory": {
             "*": "ask",
-            "~/.config/opencode/skills/*": "allow",
             "/tmp/*": "allow",
+            "~/.config/opencode/**": "allow",
+            "~/.docker/**": "allow",
         }
     },
     "formatter": {
@@ -123,6 +124,7 @@
         }
     },
     "plugin": [
+        "./plugins/pi-verifier-a2a.js",
         "@franlol/opencode-md-table-formatter@0.0.3",
         "opencode-pty@0.2.1",
         "@mohak34/opencode-notifier@0.1.19"

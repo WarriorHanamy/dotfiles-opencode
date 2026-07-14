@@ -10,7 +10,7 @@ description: Write and debug Dockerfiles with proper layer caching and dependenc
 1. Scan project for dependency sources (package.json, CMakeLists.txt, package.xml, etc.)
 2. Order layers by change frequency (stable → volatile)
 3. Write Dockerfile with one `RUN apt-get` per semantic layer
-4. Build with `DOCKER_BUILDKIT=0` for local cache fallback
+4. Build with `docker compose build <service>` (BuildKit required for cache mounts)
 5. On error: add missing package to the thinnest valid layer, rebuild
 
 ## Layer ordering principle
@@ -30,22 +30,32 @@ Layer 6: Project deps       (ros-noetic-*, npm packages)           — changes o
 If the project deps layer is Layer 3, adding one package invalidates Layers 3-6 + COPY + build.
 If it's Layer 6 (last), only the deps layer + COPY + build are invalidated.
 
-## APT layer rules
+## APT cache mounts
+
+Use BuildKit cache mounts to share apt caches across layers and rebuilds.
+Add `# syntax=docker/dockerfile:1` at the top of the Dockerfile.
 
 ```dockerfile
-# GOOD: semantic layer with cleanup
+# syntax=docker/dockerfile:1
+
+# GOOD: BuildKit cache mount — no per-layer lists cleanup needed
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    pkg1 \
+    pkg2
+
+# BAD: rm -rf in every layer, no shared cache between RUNs
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg1 \
     pkg2 \
     && rm -rf /var/lib/apt/lists/*
-
-# BAD: monolithic, no cleanup, mixed semantics
-RUN apt-get update && apt-get install -y \
-    pkg1 pkg2 pkg3 pkg4 pkg5 pkg6
 ```
 
-- Every `RUN apt-get install` ends with `&& rm -rf /var/lib/apt/lists/*`
-- Use `--no-install-recommends` to minimize image size
+- Every apt `RUN` uses `--mount=type=cache` for both `/var/cache/apt` (deb files) and `/var/lib/apt/lists` (package index)
+- `sharing=locked` prevents race conditions when concurrent builds update the same cache
+- No `rm -rf /var/lib/apt/lists/*` — lists live on the cache mount, not in the image layer
+- Use `--no-install-recommends` to minimize downloads
 - One semantic layer per `RUN` (base tools, libs, runtime, debug)
 - Never combine unrelated categories in one `RUN`
 
@@ -55,17 +65,23 @@ RUN apt-get update && apt-get install -y \
 - `source` is a bash builtin — use `.` instead, or `bash -c "..."`
 - For ROS setup scripts that require bash: `RUN bash -c ". /opt/ros/noetic/setup.bash && make"`
 
+## Proxy
+
+Do not `unset http_proxy` in Dockerfile `RUN` commands. If a proxy is needed
+for external network access, pass it via `--build-arg`:
+
+```bash
+docker compose build --build-arg HTTP_PROXY=http://proxy:3128 devel
+```
+
 ## Build commands
 
 ```bash
-# Standard build (uses BuildKit by default)
+# Standard build (BuildKit required for --mount=cache)
 docker compose build <service>
 
-# BuildKit disabled: fallback to local image cache when registry unreachable
-DOCKER_BUILDKIT=0 docker compose build <service>
-
 # Force rebuild specific layer (no cache)
-DOCKER_BUILDKIT=0 docker compose build --no-cache <service>
+docker compose build --no-cache <service>
 
 # Build specific target in multi-stage
 docker build --target devel -t myimage:devel .
@@ -105,13 +121,15 @@ ghcr.io/myorg/am-real/arm64-ubuntu22.04-cuda12.1/test:b7978de   # ROS humble, Je
 | humble     | 22.04   | `ros:humble-ros-base`          |
 | jazzy      | 24.04   | `ros:jazzy-ros-base`           |
 
+> **常见错误:** `ros:noetic-base` 不存在。必须写 `ros:noetic-ros-base`（中间有 `ros-`）。
+
 ## Debugging build failures
 
 1. `apt-get` failure — check package name; run `apt-cache search <name>` in container
 2. `COPY failed: file not found` — check `.dockerignore` and build context
 3. `source: not found` — use `bash -c` or `.` instead of `source`
 4. `catkin_package` not found — missing `find_package(catkin REQUIRED COMPONENTS roscpp)`
-5. Timeout on registry — use `DOCKER_BUILDKIT=0` + pre-pull with `docker pull`
+5. Timeout on registry — pre-pull base images with `docker pull` before build
 6. Layer cache miss — reorder layers; put stable deps first
 
 ## ROS/catkin projects (special handling)
@@ -157,13 +175,14 @@ Some packages may not exist as `ros-noetic-*` (e.g., `cmake_utils` from HKUST).
 Use try-install fallback:
 
 ```bash
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-roscpp \
     ros-noetic-std-msgs \
     ... \
     || true && \
-    (apt-get install -y ros-noetic-cmake-utils || true) && \
-    rm -rf /var/lib/apt/lists/*
+    (apt-get install -y ros-noetic-cmake-utils || true)
 ```
 
 ### Step 6: ADR documentation

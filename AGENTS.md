@@ -26,7 +26,7 @@
 - Existing projects follow repository style configs and local patterns.
 - Fresh projects use 4-space indentation by default.
 - **Tool preference**: Use `edit` for in-place modifications; use `write` only for new files or when replacing entire content. Avoid large `write` operations that may time out.
-- **ROS verification**: Always invoke `pi-verifier` after writing code for ROS projects.
+- **ROS verification**: Use `pi-build-verifier` at system/phase boundaries (batch end, pre-PR), not per-file.
 
 ## Workspace Hygiene
 
@@ -46,19 +46,32 @@
 - Host system: Arch Linux with Hyprland (Wayland).
 - For ROS/PX4 projects, always use Docker containers to ensure environment consistency.
 
-## pi-verifier
+## Shell Environment
 
-- Location: `~/.pi/agent/bin/pi-verifier`
+| Context | Shell | Note |
+|---------|-------|------|
+| User (terminal) | fish | `o push`/`o p` → `opencode run "commit and push ..."` |
+| Agent (tool exec) | bash | All shell commands run via bash |
+
+## pi-build-verifier and Pi A2A
+
+`pi-build-verifier` is a **system-level meta prompt verifier**, not a per-file build checker.
+
+- Binary: `~/.pi/agent/bin/pi-build-verifier`
 - Must be in PATH (`~/.pi/agent/bin`) — already added via `.bashrc`.
-- Invoke after every ROS `.cpp` / `.hpp` write or edit.
+- **Do not invoke after every file edit.** It validates whether the full project state (AGENTS.md + Docker lifecycle + git diff + build system) is coherent at system/phase boundaries — e.g., before a PR, after a batch of changes, or when explicitly requested.
 - Usage:
   ```bash
-  git diff HEAD -- path/to/changed/files... | pi-verifier <PROJECT_ROOT>
+  pi-build-verifier <PROJECT_ROOT>
   ```
-- PROJECT_ROOT is the only required argument. Pipe `git diff` for changed content.
-- If `"blocked":true`, AGENTS.md at PROJECT_ROOT lacks a proper `## Build commands` section.
-- If `"blocked":false`, the `"item"` hints are sufficient guidance. Address required items, then move on — **do not rerun** pi-verifier after fixing hinted items.
-- Hints from the first run are the canonical feedback; rerunning produces no new info for non-blocked cases.
+- Do not pipe git diff and do not pass file lists. `PROJECT_ROOT` is the only argument; the verifier derives git changes itself after AGENTS.md/Docker contract bootstrap passes.
+- First step is AGENTS.md + Docker lifecycle validation, before git diff. If `"blocked":true`, fix AGENTS.md and Docker devel/test/release documentation first.
+- Build commands are always Docker-based. Bare host `catkin build`/`colcon build` commands are valid only as inner commands explicitly run inside a Docker devel container.
+- Follow the `retry` field: if `retry:true`, rerun pi-build-verifier after addressing recommendations; if `retry:false`, treat the recommendations as sufficient for the current pass and move on.
+- For opencode -> Pi delegation, use:
+  ```bash
+  pi-a2a <PROJECT_ROOT> "<bounded task for Pi>"
+  ```
 
 ## System Prompts (not skills)
 
@@ -69,7 +82,7 @@ appear in the model's tool selection.
 
 | Directory | Command | Purpose |
 |-----------|---------|---------|
-| `system_prompts/verify-build/` | `--append-system-prompt` | ROS code change verifier (pi-verifier) |
+| `system_prompts/verify-build/` | `--append-system-prompt` | System meta prompt verifier (pi-build-verifier) |
 | `system_prompts/docker-build/` | `--append-system-prompt` | Docker build + push to local registry |
 
 ## Python Environment
@@ -93,6 +106,25 @@ When building Docker images iteratively (resolving missing deps, fixing compile 
 - **Entrypoint shell**: use `.` not `source` in Dockerfile `RUN` (dash/sh); use `bash -c` when sourcing ROS `setup.bash` (bash-isms).
 - **Container naming**: `{domain}-{phase}-{id}` where id = git sha (CI) or timestamp (local).
 - **ROS dependency scanning**: union of `package.xml` tags + `CMakeLists.txt` `find_package(catkin COMPONENTS ...)`. Many projects have mismatches — conservative union is safest. See `write-dockerfile` skill.
+
+## Artifacts Mount Convention
+
+All projects using Docker-based builds MUST follow the canonical artifacts mount convention:
+
+<pre>
+Host: &lt;project_root&gt;/.artifacts/
+Container: /workspace/.artifacts/
+</pre>
+
+Requirements:
+- `.artifacts/` is the canonical host-side directory for build artifacts, caches, and runtime outputs. It MUST be hidden (dot-prefixed) and listed in `.gitignore`.
+- Every compose service that compiles or runs the project MUST bind-mount `./.artifacts/` to `/workspace/.artifacts/` (or `.artifacts/{phase}/` for multi-phase setups where `{phase}` is `devel`, `test`, or `release`).
+- Build artifacts reside under `.artifacts/{phase}/`.
+- Never mount the entire project root as `/workspace`. Only mount source directories and `.artifacts/`.
+- `/workspace` is the canonical container working directory.
+- `CATKIN_WORKSPACE` / `COLCON_WORKSPACE` MUST be `/workspace`.
+
+This convention is enforced by `pi-build-verifier` during system-level verification.
 
 ## Stateless Reliability
 
