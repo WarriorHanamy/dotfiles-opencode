@@ -117,13 +117,13 @@
             }
         }
     },
-    "model": "deepseek/deepseek-v4-flash",
+    "model": "kimi-code/kimi-for-coding-highspeed",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "deepseek/deepseek-v4-flash",
+            "model": "kimi-code/kimi-for-coding-highspeed",
         },
         "plan": {
             "model": "kimi-code/k3",
@@ -168,7 +168,8 @@
     "permission": {
         "external_directory": {
             "*": "ask",
-            "/tmp/*": "allow",
+            "/tmp/**": "allow",
+            "~/worktrees/**": "allow",
             "~/.config/opencode/**": "allow",
             "~/.docker/**": "allow",
         }

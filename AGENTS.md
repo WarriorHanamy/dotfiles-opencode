@@ -26,7 +26,7 @@
 - Existing projects follow repository style configs and local patterns.
 - Fresh projects use 4-space indentation by default.
 - **Tool preference**: Use `edit` for in-place modifications; use `write` only for new files or when replacing entire content. Avoid large `write` operations that may time out.
-- **ROS verification**: Use `pi-build-verifier` at system/phase boundaries (batch end, pre-PR), not per-file.
+- **ROS verification**: Use the `pi-build-verifier` skill at system/phase boundaries (batch end, pre-PR), not per-file.
 
 ## Workspace Hygiene
 
@@ -52,26 +52,6 @@
 |---------|-------|------|
 | User (terminal) | fish | `o push`/`o p` → `opencode run "commit and push ..."` |
 | Agent (tool exec) | bash | All shell commands run via bash |
-
-## pi-build-verifier and Pi A2A
-
-`pi-build-verifier` is a **system-level meta prompt verifier**, not a per-file build checker.
-
-- Binary: `~/.pi/agent/bin/pi-build-verifier`
-- Must be in PATH (`~/.pi/agent/bin`) — already added via `.bashrc`.
-- **Do not invoke after every file edit.** It validates whether the full project state (AGENTS.md + Docker lifecycle + git diff + build system) is coherent at system/phase boundaries — e.g., before a PR, after a batch of changes, or when explicitly requested.
-- Usage:
-  ```bash
-  pi-build-verifier <PROJECT_ROOT>
-  ```
-- Do not pipe git diff and do not pass file lists. `PROJECT_ROOT` is the only argument; the verifier derives git changes itself after AGENTS.md/Docker contract bootstrap passes.
-- First step is AGENTS.md + Docker lifecycle validation, before git diff. If `"blocked":true`, fix AGENTS.md and Docker devel/test/release documentation first.
-- Build commands are always Docker-based. Bare host `catkin build`/`colcon build` commands are valid only as inner commands explicitly run inside a Docker devel container.
-- Follow the `retry` field: if `retry:true`, rerun pi-build-verifier after addressing recommendations; if `retry:false`, treat the recommendations as sufficient for the current pass and move on.
-- For opencode -> Pi delegation, use:
-  ```bash
-  pi-a2a <PROJECT_ROOT> "<bounded task for Pi>"
-  ```
 
 ## System Prompts (not skills)
 
