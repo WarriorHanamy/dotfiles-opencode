@@ -141,6 +141,19 @@ This convention is enforced by `pi-build-verifier` during system-level verificat
 
 - When operating across repositories, first read `<target-repo>/AGENTS.md` to understand its conventions, build system, and project-specific rules.
 
+## Multi-Remote Push (uss-nav)
+
+`uss-nav` has 3 remotes. After `git push` to `origin`, the user may also request push to `company` and `gitlab`:
+
+```
+origin   https://github.com/WarriorHanamy/uss-nav.git
+company  https://github.com/zhywwyzh/uss-nav.git
+gitlab   http://rec@192.168.108.83:8929/big_brain/rec-uss-nav.git
+```
+
+- `gitlab` push works directly (token in URL).
+- `company` push may require interactive auth (GitHub credentials); if push fails or is aborted, notify the user.
+
 ## Preference
 
 See the Makefile if it exists

@@ -80,7 +80,37 @@ EOF
 git push -u origin <branch>
 ```
 
-For the first push of a new branch, include `-u origin <branch>`.
+### 6. Gitlab remote sync
+
+Only if the remote `gitlab` exists. Fetch first, then compare ahead/behind to decide:
+
+```
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if ! git remote | grep -q '^gitlab$'; then
+  : # no gitlab remote, skip
+elif git rev-parse --verify gitlab/$BRANCH >/dev/null 2>&1; then
+  # remote branch exists — fetch and compare
+  git fetch gitlab $BRANCH 2>/dev/null || git fetch gitlab 2>/dev/null
+  COUNTS=$(git rev-list --left-right --count $BRANCH...gitlab/$BRANCH)
+  AHEAD=$(echo "$COUNTS" | cut -f1)
+  BEHIND=$(echo "$COUNTS" | cut -f2)
+
+  if [ "$AHEAD" -gt 0 ] && [ "$BEHIND" -eq 0 ]; then
+    # gitlab is behind — safe fast-forward push
+    git push gitlab $BRANCH
+  elif [ "$BEHIND" -gt 0 ] && [ "$AHEAD" -eq 0 ]; then
+    echo "ERROR: gitlab/$BRANCH is ahead — pull/rebase first, then retry"
+  elif [ "$BEHIND" -gt 0 ] && [ "$AHEAD" -gt 0 ]; then
+    echo "ERROR: gitlab/$BRANCH diverged — pull/rebase first, then retry"
+  else
+    echo "gitlab/$BRANCH already in sync"
+  fi
+else
+  # new branch — first push with -u
+  git push -u gitlab $BRANCH
+fi
+```
 
 ## Commit Message Examples
 

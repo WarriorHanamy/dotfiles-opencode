@@ -30,6 +30,61 @@
             }
         },
 
+        "kimi-code": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "Kimi Code",
+            "options": {
+                "baseURL": "https://api.kimi.com/coding/v1",
+                "apiKey": "{env:KIMI_CODE_API_KEY}"
+            },
+            "models": {
+                "k3": {
+                    "name": "Kimi K3 (1M)",
+                    "reasoning": true,
+                    "attachment": true,
+                    "limit": {
+                        "context": 1048576,
+                        "output": 131072
+                    },
+                    "modalities": {
+                        "input": ["text", "image", "video"],
+                        "output": ["text"]
+                    },
+                    "variants": {
+                        "max": { "reasoning_effort": "max" },
+                        "high": { "reasoning_effort": "high" },
+                        "off": { "thinking": { "type": "disabled" } }
+                    }
+                },
+                "kimi-for-coding": {
+                    "name": "Kimi K2.7 Coding",
+                    "reasoning": true,
+                    "attachment": true,
+                    "limit": {
+                        "context": 262144,
+                        "output": 32768
+                    },
+                    "modalities": {
+                        "input": ["text", "image", "video"],
+                        "output": ["text"]
+                    }
+                },
+                "kimi-for-coding-highspeed": {
+                    "name": "Kimi K2.7 Coding Highspeed",
+                    "reasoning": true,
+                    "attachment": true,
+                    "limit": {
+                        "context": 262144,
+                        "output": 32768
+                    },
+                    "modalities": {
+                        "input": ["text", "image", "video"],
+                        "output": ["text"]
+                    }
+                }
+            }
+        },
+
         "deepseek": {
             "npm": "@ai-sdk/openai-compatible",
             "options": {
@@ -68,10 +123,11 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "deepseek/deepseek-v4-flash"
+            "model": "deepseek/deepseek-v4-flash",
         },
         "plan": {
-            "model": "deepseek/deepseek-v4-pro"
+            "model": "kimi-code/k3",
+            "variant": "high"
         },
         "explore": {
             "model": "deepseek/deepseek-v4-flash",

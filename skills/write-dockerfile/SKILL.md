@@ -123,6 +123,23 @@ ghcr.io/myorg/am-real/arm64-ubuntu22.04-cuda12.1/test:b7978de   # ROS humble, Je
 
 > **常见错误:** `ros:noetic-base` 不存在。必须写 `ros:noetic-ros-base`（中间有 `ros-`）。
 
+### Noetic 镜像标签：`focal` vs `full`
+
+`focal` 和 `full` 是不同的维度，不应混淆：
+
+| 标签 | 描述 |
+|------|------|
+| `osrf/ros:noetic-desktop-focal` | Ubuntu 20.04 Focal，ROS **desktop** 级别（RViz, rqt, 基础库） |
+| `osrf/ros:noetic-desktop-full` | 同上，额外安装 `ros-noetic-desktop-full` 元包（+Gazebo, 仿真, 感知包） |
+| `osrf/ros:noetic-desktop-full-focal` | `full` 的完整名称，省略 `-focal` 时默认 Focal |
+
+继承关系：`focal` → `apt install ros-noetic-desktop-full` → `full`。`desktop-full` 是 `desktop` 的超集。
+
+**选型建议：**
+- 需要 RViz/rqt/编译运行节点 → `osrf/ros:noetic-desktop-focal`（优先选用）
+- 需要 Gazebo/完整仿真 → `osrf/ros:noetic-desktop-full` 或显式安装 `ros-noetic-gazebo-*`
+- 生产运行镜像 → 使用 `ros:noetic-ros-base` 或 `desktop`，仅安装实际依赖，镜像更小更快
+
 ## Debugging build failures
 
 1. `apt-get` failure — check package name; run `apt-cache search <name>` in container
