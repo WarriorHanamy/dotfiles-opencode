@@ -123,7 +123,7 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "kimi-code/kimi-for-coding-highspeed",
+            "model": "deepseek/deepseek-v4-flash",
         },
         "plan": {
             "model": "kimi-code/k3",
@@ -171,6 +171,7 @@
             "/tmp/**": "allow",
             "~/worktrees/**": "allow",
             "~/.config/opencode/**": "allow",
+            "~/.config/mihomo-party/**": "allow",
             "~/.docker/**": "allow",
         }
     },
