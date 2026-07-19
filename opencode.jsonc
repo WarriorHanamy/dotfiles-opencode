@@ -172,6 +172,7 @@
             "~/worktrees/**": "allow",
             "~/.config/opencode/**": "allow",
             "~/.config/mihomo-party/**": "allow",
+            "~/.pi/**": "allow",
             "~/.docker/**": "allow",
         }
     },

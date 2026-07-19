@@ -26,8 +26,6 @@
 - Existing projects follow repository style configs and local patterns.
 - Fresh projects use 4-space indentation by default.
 - **Tool preference**: Use `edit` for in-place modifications; use `write` only for new files or when replacing entire content. Avoid large `write` operations that may time out.
-- **ROS verification**: Use the `pi-build-verifier` skill at system/phase boundaries (batch end, pre-PR), not per-file.
-
 ## Workspace Hygiene
 
 - Keep workspace clean and keep temporary analysis scripts in `/tmp`.
@@ -62,8 +60,6 @@ appear in the model's tool selection.
 
 | Directory | Command | Purpose |
 |-----------|---------|---------|
-| `system_prompts/verify-build/` | `--append-system-prompt` | System meta prompt verifier (pi-build-verifier) |
-| `system_prompts/docker-build/` | `--append-system-prompt` | Docker build + push to local registry |
 
 ## Python Environment
 
@@ -103,8 +99,6 @@ Requirements:
 - Never mount the entire project root as `/workspace`. Only mount source directories and `.artifacts/`.
 - `/workspace` is the canonical container working directory.
 - `CATKIN_WORKSPACE` / `COLCON_WORKSPACE` MUST be `/workspace`.
-
-This convention is enforced by `pi-build-verifier` during system-level verification.
 
 ## Stateless Reliability
 
