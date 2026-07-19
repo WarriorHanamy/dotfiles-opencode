@@ -10,16 +10,19 @@ A CLI tool for browser automation. It maintains a persistent browser session wit
 ## Before You Start
 
 ### Use agent-browser only for interaction
+
 For reading or fetching web content, prefer standard web search and
 fetch tools. Use agent-browser only when the task requires interaction:
 clicking, form submission, or stateful navigation.
 
 ### Subagent safety gate
+
 If running as a subagent, you MUST load the `testing-safety-protocol`
 skill before using agent-browser. Only proceed if the protocol permits.
 If it does not permit, stop and do not use agent-browser.
 
 ### --headed
+
 - Primary agent (interactive session with user): always `--headed`
 - Subagent: headless by default; use `--headed` only if explicitly instructed
 
