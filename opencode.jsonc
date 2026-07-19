@@ -123,7 +123,7 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "deepseek/deepseek-v4-flash",
+            "model": "deepseek/deepseek-v4-flash"
         },
         "plan": {
             "model": "kimi-code/k3",
@@ -146,7 +146,7 @@
                 "--api-key",
                 "{env:CONTEXT7_TOKEN}"
             ],
-            "enabled": true,
+            "enabled": true
         },
         "chrome-devtools": {
             "type": "local",
@@ -162,7 +162,7 @@
         "grep": {
             "type": "remote",
             "url": "https://mcp.grep.app",
-            "enabled": true,
+            "enabled": true
         }
     },
     "permission": {
@@ -174,6 +174,11 @@
             "~/.config/mihomo-party/**": "allow",
             "~/.pi/**": "allow",
             "~/.docker/**": "allow",
+            "/etc/systemd/network/**": "allow",
+            "/usr/lib/systemd/network/**": "allow"
+        },
+        "edit": {
+            "/usr/lib/systemd/network/**": "deny"
         }
     },
     "formatter": {
