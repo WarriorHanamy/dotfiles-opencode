@@ -3,6 +3,8 @@
     "experimental": {
         "mcp_timeout": 120000
     },
+    // api.openai.com is blocked on this network; never load the OpenAI provider
+    "disabled_providers": ["openai", "wandb", "gitlab"],
     "provider": {
         "mimo": {
             "npm": "@ai-sdk/openai-compatible",
@@ -117,7 +119,8 @@
             }
         }
     },
-    "model": "kimi-code/kimi-for-coding-highspeed",
+    // "model": "kimi-code/kimi-for-coding-highspeed",
+    "model": "deepseek/deepseek-v4-pro",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
     "default_agent": "build",
@@ -126,7 +129,7 @@
             "model": "deepseek/deepseek-v4-flash"
         },
         "plan": {
-            "model": "kimi-code/k3",
+            "model": "deepseek/deepseek-v4-pro",
             "variant": "high"
         },
         "explore": {
@@ -188,7 +191,6 @@
         }
     },
     "plugin": [
-        "./plugins/pi-verifier-a2a.js",
         "@franlol/opencode-md-table-formatter@0.0.3",
         "opencode-pty@0.2.1",
         "@mohak34/opencode-notifier@0.1.19"

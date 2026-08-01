@@ -1,11 +1,11 @@
 ---
 name: commit-push
-description: Stage, commit with conventional commit message, and push to origin. Use when user says "commit and push", "push", "/commit", "commit push", or "提交并推送".
+description: Stage, commit with conventional commit message, and push to origin. Also handles tagged releases (creates GitLab Release via glab). Use when user says "commit and push", "push", "/commit", "commit push", "提交并推送", or "release as vX.Y.Z".
 ---
 
 # Commit and Push
 
-Stage all changes, commit with a conventional commit message, and push to origin.
+Stage all changes, commit with a conventional commit message, and push to origin. Also handles annotated tags and GitLab Releases when requested.
 
 ## Workflow
 
@@ -112,6 +112,41 @@ else
 fi
 ```
 
+### 7. Tag and release
+
+When the user requests a release ("release as vX.Y.Z", "tag", "发布", etc.):
+
+1. Create an annotated tag:
+
+   ```bash
+   git tag -a <version> -m "<description>"
+   ```
+
+2. Push the tag to `origin`:
+
+   ```bash
+   git push origin <version>
+   ```
+
+3. If a `gitlab` remote exists, also push the tag and create a **GitLab Release**
+   (a tag alone does not appear under `/-/releases`; a Release object must be
+   created separately via the API — use `glab`):
+
+   ```bash
+   git push gitlab <version>
+
+    REPO=$(git remote get-url gitlab | sed -E 's|.*[:/]([^/]+/[^/]+?)(\.git)?$|\1|' | sed 's|\.git$||')
+
+   glab release create <version> \
+     --repo "$REPO" \
+     --name "<version>" \
+     --notes "<description>" \
+     --tag-message "<description>"
+   ```
+
+   `glab` must be authenticated (config or `GITLAB_TOKEN` env var). If `glab`
+   release creation fails, report the error — do not silently skip it.
+
 ## Commit Message Examples
 
 ```
@@ -139,3 +174,4 @@ rounded up instead of truncating.
 - Never create a branch unless the user explicitly asks for one.
 - Subject line: imperative mood, ≤50 characters, no trailing period.
 - Body: prose paragraph, no lists or templates.
+- A release request = annotated tag + `git push <remote> <tag>` + `glab release create` (GitLab Release object, not just the tag).

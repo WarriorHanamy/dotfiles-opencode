@@ -77,8 +77,8 @@ When building Docker images iteratively (resolving missing deps, fixing compile 
 - **Split `RUN apt-get` into semantic layers** (base tools → build tools → system libs → runtime → debug tools → project deps). Each layer caches independently; adding a new package only rebuilds the affected layer.
 - **Layer ordering by volatility**: stable layers first, volatile layers last. ROS/noetic deps go in the **last** `RUN apt-get` layer (just before COPY/compile) because they change most often during debugging. Debug tools go second-to-last (one-time addition, stable).
 - **Pattern**: build → read error → add missing package to the thinnest valid layer → rebuild. Never append to an existing monolithic `RUN apt-get`.
-- **APT cleanup**: every `RUN apt-get install` ends with `&& rm -rf /var/lib/apt/lists/*` to avoid bloating intermediate layers.
-- **Build command**: `DOCKER_BUILDKIT=0 docker compose build <service>` (disable BuildKit to use local image cache when Docker Hub is unreachable).
+- **APT caching**: use BuildKit cache mounts (`/var/cache/apt` + `/var/lib/apt`, `sharing=locked`) and disable `/etc/apt/apt.conf.d/docker-clean` first; never `rm -rf /var/lib/apt/lists/*` or `apt-get clean`. See `write-dockerfile` skill for the mandatory pattern.
+- **Build command**: `docker compose build <service>` (BuildKit is required for cache mounts; Docker >= 23 enables it by default). If Docker Hub is unreachable, pre-pull base images — never disable BuildKit with `DOCKER_BUILDKIT=0`.
 - **Entrypoint shell**: use `.` not `source` in Dockerfile `RUN` (dash/sh); use `bash -c` when sourcing ROS `setup.bash` (bash-isms).
 - **Container naming**: `{domain}-{phase}-{id}` where id = git sha (CI) or timestamp (local).
 - **ROS dependency scanning**: union of `package.xml` tags + `CMakeLists.txt` `find_package(catkin COMPONENTS ...)`. Many projects have mismatches — conservative union is safest. See `write-dockerfile` skill.
@@ -115,18 +115,16 @@ Requirements:
 
 - When operating across repositories, first read `<target-repo>/AGENTS.md` to understand its conventions, build system, and project-specific rules.
 
-## Multi-Remote Push (uss-nav)
+## Git Remotes (uss-nav)
 
-`uss-nav` has 3 remotes. After `git push` to `origin`, the user may also request push to `company` and `gitlab`:
+Each uss-nav repo has a single remote on the local GitLab; pushes go straight there:
 
 ```
-origin   https://github.com/WarriorHanamy/uss-nav.git
-company  https://github.com/zhywwyzh/uss-nav.git
-gitlab   http://rec@192.168.108.83:8929/big_brain/rec-uss-nav.git
+l3-uss-nav-amd64: origin  http://192.168.108.83:8929/big_brain/l3-uss-nav-amd64.git
+l3-uss-nav-arm64: gitlab  http://rec@192.168.108.83:8929/big_brain/l3-uss-nav.git
 ```
 
-- `gitlab` push works directly (token in URL).
-- `company` push may require interactive auth (GitHub credentials); if push fails or is aborted, notify the user.
+No other remotes (github/company/rec-uss-nav) are configured; do not push to them.
 
 ## Preference
 

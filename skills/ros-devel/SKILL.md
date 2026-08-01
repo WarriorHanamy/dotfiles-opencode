@@ -63,6 +63,104 @@ devel image -> build-test(flags for test) -> test(headless, artifacts ro)
 ```
 Build artifacts persist on host. Test mounts artifacts read-only. Release COPYs into image.
 
+## Compile Session
+
+**Agent directive**: When an agent needs to compile a ROS project, delegate to
+`@ compile-watcher`. Never inline the polling loop in the main agent — it wastes
+context and blocks the session. The compile-watcher subagent handles start,
+monitor, parse, and report as one synchronous call.
+
+Two modes for running `catkin build`:
+
+### Agent mode — `@ compile-watcher`
+
+Custom subagent at `~/.config/opencode/agents/compile-watcher.md`. Blocks synchronously, returns structured report.
+
+```
+@ compile-watcher make compile in /home/rec/diff-dockers/l3-uss-nav-amd64
+```
+
+Workflow: starts `make compile` (tmux detached) → polls `compile.log` → parses Summary → reports success/failure + errors + tips.
+
+### Manual mode — tmux
+
+For human debugging:
+
+```
+make compile
+tmux attach -t <project>-compile
+```
+
+## Incremental Compile
+
+### Rules of thumb
+
+| State | Action |
+|---|---|
+| Source code (`src/`) changed | `make compile` — catkin auto-detects |
+| Same-package repeated error | `catkin build --force-cmake <pkg>` — invalidates stale cmake cache |
+| CMakeLists.txt changed | auto-detected by catkin, no manual flag needed |
+| Docker image config changed (`docker/assets/*`, `Dockerfile`) | `make build` first, then `catkin build --force-cmake <pkg>` |
+| Only one package changed | `catkin build --no-deps <pkg>` — skip upstream rebuild |
+| Start from middle of workspace | `catkin build --start-with <pkg>` — skip earlier packages |
+| Full single-package rebuild | `catkin build --pre-clean <pkg>` — deletes build dir + cache |
+
+### Anti-patterns
+
+- **Don't** `rm -rf .artifacts/` for a single-package fix — use `--force-cmake` or `--pre-clean`
+- **Don't** rebuild Docker image for source-only changes — `src/` is bind-mounted at compile time
+- **Don't** use `catkin_make` for workspace-level compile — use `catkin build` (catkin_tools)
+
+### When to full-wipe `.artifacts/`
+
+Only when workspace-level cmake configuration changes:
+- ROS distro version change
+- Python version change
+- Catkin tool change (`catkin_make` → `catkin build`)
+- C++ standard changed (`-std=c++14` → `-std=c++17` at workspace level)
+- System-level cmake policy change
+
+## Artifacts Ownership
+
+### Root ownership problem
+
+Docker containers run as `root` by default. Bind-mounted `.artifacts/{build,devel}` are
+owned by `root` on the host after a compile.
+
+### Cleaning with a container (preferred)
+
+Use a named cleanup container instead of `sudo rm -rf`:
+
+```bash
+docker run --rm --name artifact-cleaner \
+  -v "${PROJECT_DIR}/.artifacts:/target" \
+  -w /target \
+  alpine:3.19 \
+  sh -c 'rm -rf build devel compile.log'
+```
+
+Container name `artifact-cleaner` clarifies intent in `docker ps`. No sudo, no
+host permission escalation. Works as unprivileged user.
+
+### Solutions
+
+| Solution | Trade-off |
+|---|---|
+| `sudo rm -rf .artifacts/build` | Simple, needs sudo |
+| `sudo chown $USER -R .artifacts/` | Restores ownership, keeps cache |
+| `docker run --user $(id -u):$(id -g)` | No root files created; but may cause permission errors if image expects root |
+| Compile script pre-creates dirs world-writable: `mkdir -p -m 777 .artifacts/{build,devel}` | Simple, but relaxes permissions |
+| Compile script ends with `chown` | Guarantees clean state, adds a few seconds |
+
+### Recommended pattern
+
+Pre-create `.artifacts/{build,devel}` with world-writable permissions in the compile script
+(before `docker run`). The container (root) and host user can both write without conflict.
+
+```bash
+mkdir -p -m 777 "${ARTIFACT_DIR}/build" "${ARTIFACT_DIR}/devel"
+```
+
 ## Bringup
 Self-contained ROS package for launch files, configs, data, maps.
 

@@ -30,17 +30,37 @@ Layer 6: Project deps       (ros-noetic-*, npm packages)           — changes o
 If the project deps layer is Layer 3, adding one package invalidates Layers 3-6 + COPY + build.
 If it's Layer 6 (last), only the deps layer + COPY + build are invalidated.
 
-## APT cache mounts
+## APT cache mounts (MANDATORY for any Dockerfile using apt)
 
-Use BuildKit cache mounts to share apt caches across layers and rebuilds.
-Add `# syntax=docker/dockerfile:1` at the top of the Dockerfile.
+Use BuildKit cache mounts to share apt caches across layers, rebuilds, and projects
+on the same build host.
+
+**Do NOT add `# syntax=docker/dockerfile:1`** unless pinning a specific frontend
+version: BuildKit pulls that frontend image from Docker Hub on every fresh builder,
+which fails on offline/proxied build hosts. The built-in frontend (buildx >= 0.10,
+Docker >= 23) supports everything in this guide.
+
+### Step 1 — REQUIRED preamble: disable docker-clean
+
+Debian/Ubuntu base images ship `/etc/apt/apt.conf.d/docker-clean`, which deletes
+downloaded `.deb` files immediately after install. Without this step the cache
+mount stays **empty forever** — the classic "cache works today, gone tomorrow"
+symptom. This preamble is non-negotiable in every Dockerfile that runs apt:
 
 ```dockerfile
-# syntax=docker/dockerfile:1
+FROM <base>
 
-# GOOD: BuildKit cache mount — no per-layer lists cleanup needed
+# Disable docker-clean so apt cache mounts actually retain .deb files
+RUN rm -f /etc/apt/apt.conf.d/docker-clean \
+ && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+```
+
+### Step 2 — every apt RUN uses cache mounts
+
+```dockerfile
+# GOOD: BuildKit cache mounts — no per-layer cleanup, cache survives rebuilds
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     pkg1 \
     pkg2
@@ -52,18 +72,92 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 ```
 
-- Every apt `RUN` uses `--mount=type=cache` for both `/var/cache/apt` (deb files) and `/var/lib/apt/lists` (package index)
-- `sharing=locked` prevents race conditions when concurrent builds update the same cache
-- No `rm -rf /var/lib/apt/lists/*` — lists live on the cache mount, not in the image layer
+### Hard rules
+
+- **NEVER rewrite the base image's distro apt sources** (e.g. `sed` replacing
+  `archive.ubuntu.com` / `ports.ubuntu.com` with a mirror). Slow upstream
+  archives are a build-host network problem — solve them with proxy/cache
+  infrastructure, never by mutating sources in the Dockerfile. (Project-specific
+  vendor sources such as the ROS apt repo may be replaced when the project
+  already establishes that pattern.)
+- Every apt `RUN` mounts both `/var/cache/apt` (deb files) and `/var/lib/apt`
+  (package index) — never only one
+- `sharing=locked` on both mounts (prevents races in concurrent builds)
+- **FORBIDDEN** after switching to cache mounts:
+  - `rm -rf /var/lib/apt/lists/*` — deletes the cached index
+  - `apt-get clean` / `apt-get autoclean` — deletes the cached debs
+  - Skipping the docker-clean preamble (silently defeats everything)
+- Keep default cache ids (id = target path) so all images on the same host share
+  one apt cache; do not set custom `id=` unless isolation is required
 - Use `--no-install-recommends` to minimize downloads
 - One semantic layer per `RUN` (base tools, libs, runtime, debug)
 - Never combine unrelated categories in one `RUN`
+
+### Build host requirements
+
+- **buildx plugin is required**: Docker >= 23 has no legacy builder; without the
+  buildx CLI plugin, `docker build` fails with "the --mount option requires
+  BuildKit". On Ubuntu docker.io: `apt install docker-buildx`. On Docker CE:
+  `apt install docker-buildx-plugin`. Verify with `docker buildx version`.
+- **Never** build with `DOCKER_BUILDKIT=0` — cache mounts stop working. If a
+  registry is unreachable, pre-pull base images instead of disabling BuildKit.
+- **`docker build --no-cache` also bypasses cache mounts** — every `--no-cache`
+  build gets a fresh, empty cache mount. Never use `--no-cache` to iterate or
+  to verify apt caching. To force a layer re-run while keeping cache mounts,
+  use a cache-buster ARG: `ARG CACHEBUST=0` before the RUN, then
+  `docker build --build-arg CACHEBUST=$(date +%s)`.
+- On proxied/offline hosts, inject proxy settings into build containers via
+  the build user's `~/.docker/config.json` (auto-applied as build args; apt
+  then needs no container DNS because the proxy is an IP literal):
+  ```json
+  { "proxies": { "default": {
+      "httpProxy": "http://192.168.55.100:7890",
+      "httpsProxy": "http://192.168.55.100:7890",
+      "noProxy": "localhost,127.0.0.1,192.168.55.0/24" } } }
+  ```
+- Cache mounts persist across days/reboots, but are deleted by
+  `docker system prune`, `docker builder prune`, and BuildKit GC under disk
+  pressure. Do not schedule prune jobs on build hosts.
+- Verify cache health: `docker buildx du -v` should show non-zero entries for
+  `/var/cache/apt` and `/var/lib/apt`; a second build (cache-buster, no
+  `--no-cache`) must print `Hit:` for indexes and download zero `.deb` files.
 
 ## Shell compatibility
 
 - Dockerfile `RUN` uses `/bin/sh` (dash) by default
 - `source` is a bash builtin — use `.` instead, or `bash -c "..."`
 - For ROS setup scripts that require bash: `RUN bash -c ". /opt/ros/noetic/setup.bash && make"`
+
+## ROS networking env (must survive `docker exec`)
+
+`docker exec` inherits only the container config env (image `ENV` + compose
+`environment:`) — **never** variables exported inside the entrypoint script.
+If the entrypoint does `export ROS_IP=127.0.0.1` but the compose file does not,
+every `docker exec ... rostopic pub` session runs without `ROS_IP`, advertises a
+hostname-based URI that subscribers cannot resolve, and the message is
+**silently dropped** (publisher prints "publishing and latching", no subscriber
+ever receives it, no error anywhere).
+
+Set ROS networking vars in compose `environment:` (or Dockerfile `ENV`) for
+every service that runs ROS nodes:
+
+```yaml
+environment:
+  - ROS_IP=${ROS_IP:-127.0.0.1}
+  - ROS_MASTER_URI=${ROS_MASTER_URI:-http://127.0.0.1:11311}
+```
+
+Rules:
+
+- Keep the entrypoint fallback (`export ROS_IP="${ROS_IP:-127.0.0.1}"`) — compose
+  env wins, entrypoint covers bare `docker run`.
+- `network_mode: host` does NOT make this go away: the container still has its
+  own hostname and `/etc/hosts`, so an unset `ROS_IP` still yields an
+  unresolvable advertised URI.
+- Symptom signature: `rostopic info <topic>` shows the subscriber, `rostopic
+  echo` in another exec receives nothing, and the subscriber's callback never
+  fires — with zero errors in any log. Check `env | grep ROS_` inside the exec
+  session first.
 
 ## Proxy
 
@@ -77,10 +171,13 @@ docker compose build --build-arg HTTP_PROXY=http://proxy:3128 devel
 ## Build commands
 
 ```bash
-# Standard build (BuildKit required for --mount=cache)
+# Standard build (BuildKit + buildx plugin required for --mount=cache)
 docker compose build <service>
 
-# Force rebuild specific layer (no cache)
+# Force a layer re-run WITHOUT losing apt cache mounts (cache-buster ARG)
+docker build --build-arg CACHEBUST=$(date +%s) .
+
+# LAST RESORT: full rebuild — also discards apt cache mounts (fresh empty mounts)
 docker compose build --no-cache <service>
 
 # Build specific target in multi-stage
@@ -193,7 +290,7 @@ Use try-install fallback:
 
 ```bash
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-roscpp \
     ros-noetic-std-msgs \
