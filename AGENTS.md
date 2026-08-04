@@ -41,7 +41,7 @@
 
 ## System Environment
 
-- Host system: Arch Linux with Hyprland (Wayland).
+- Host system: macOS.
 - For ROS/PX4 projects, always use Docker containers to ensure environment consistency.
 
 ## Shell Environment
