@@ -41,7 +41,7 @@
 
 ## System Environment
 
-- Host system: macOS.
+- Host system: macOS 26.6 (build 25G72).
 - For ROS/PX4 projects, always use Docker containers to ensure environment consistency.
 
 ## Shell Environment
