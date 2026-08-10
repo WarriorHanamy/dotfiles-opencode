@@ -33,6 +33,12 @@
 - Empty project bootstrap can use the `setup-fresh-project` skill.
 - If the project contains a Makefile, prefer to read it to understand task pipelines and project conventions.
 
+## Port Conflict Checker
+
+- `port-check <port> [port...]` (installed at `~/.local/bin/port-check`, source: `~/port-check.sh`) checks whether port(s) collide with ports declared in `~/AGENTS.md`.
+- Run it BEFORE declaring/using a new port; on conflict it prints the declaring project folder and exits 1, on success it is silent and exits 0.
+
+
 ## Long-Running Tasks
 
 - `pty_*` tools are used for commands likely to exceed 2 minutes.
@@ -115,13 +121,18 @@ Requirements:
 
 - When operating across repositories, first read `<target-repo>/AGENTS.md` to understand its conventions, build system, and project-specific rules.
 
+## Git Naming Convention
+
+- "main" (unqualified) always means the **local** main branch.
+- "origin/main", "remote main", or "gitlab/main" explicitly mean the remote branch.
+
 ## Git Remotes (uss-nav)
 
 Each uss-nav repo has a single remote on the local GitLab; pushes go straight there:
 
 ```
-l3-uss-nav-amd64: origin  http://192.168.108.83:8929/big_brain/l3-uss-nav-amd64.git
-l3-uss-nav-arm64: gitlab  http://rec@192.168.108.83:8929/big_brain/l3-uss-nav.git
+l3-uss-nav-amd64: origin  http://192.168.20.89:8929/big_brain/l3-uss-nav-amd64.git
+l3-uss-nav-arm64: gitlab  http://rec@192.168.20.89:8929/big_brain/l3-uss-nav.git
 ```
 
 No other remotes (github/company/rec-uss-nav) are configured; do not push to them.

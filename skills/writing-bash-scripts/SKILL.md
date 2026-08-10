@@ -30,11 +30,11 @@ Run shellcheck on scripts using the provided wrapper:
 
 ```bash
 # Lint all scripts in scripts/ directory (default)
-.opencode/skill/bash/scripts/run_shellck.sh
+.opencode/skill/writing-bash-scripts/bash/scripts/run_shellck.sh
 
 # Lint specific files or directories
-.opencode/skill/bash/scripts/run_shellck.sh path/to/script.sh
-.opencode/skill/bash/scripts/run_shellck.sh scripts/ other/dir/
+.opencode/skill/writing-bash-scripts/scripts/run_shellck.sh path/to/script.sh
+.opencode/skill/writing-bash-scripts/scripts/run_shellck.sh scripts/ other/dir/
 ```
 
 The linting script:

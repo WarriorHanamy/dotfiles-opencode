@@ -96,6 +96,7 @@
             "models": {
                 "deepseek-v4-flash": {
                     "name": "DeepSeek-V4-Flash",
+                    "reasoning": true,
                     "limit": {
                         "context": 1048576,
                         "output": 131072
@@ -103,6 +104,10 @@
                     "modalities": {
                         "input": ["text"],
                         "output": ["text"]
+                    },
+                    "variants": {
+                        "max": { "reasoning_effort": "max" },
+                        "off": { "thinking": { "type": "disabled" } }
                     }
                 },
                 "deepseek-v4-pro": {
@@ -126,11 +131,12 @@
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "deepseek/deepseek-v4-flash"
+            "model": "deepseek/deepseek-v4-flash",
+            "variant": "max"
         },
         "plan": {
-            "model": "deepseek/deepseek-v4-pro",
-            "variant": "high"
+            "model": "deepseek/deepseek-v4-flash",
+            "variant": "max"
         },
         "explore": {
             "model": "deepseek/deepseek-v4-flash",
@@ -172,6 +178,7 @@
         "external_directory": {
             "*": "ask",
             "/tmp/**": "allow",
+            "*/tmp/**": "allow",
             "~/worktrees/**": "allow",
             "~/.config/opencode/**": "allow",
             "~/.config/mihomo-party/**": "allow",
