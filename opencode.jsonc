@@ -120,20 +120,21 @@
         }
     },
     // "model": "kimi-code/kimi-for-coding-highspeed",
-    "model": "deepseek/deepseek-v4-pro",
+    // "model": "deepseek/deepseek-v4-pro",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
+    "model": "opencode-go/deepseek-v4-flash",
     "default_agent": "build",
     "agent": {
         "build": {
-            "model": "deepseek/deepseek-v4-flash"
+            "model": "opencode-go/deepseek-v4-flash"
         },
         "plan": {
-            "model": "deepseek/deepseek-v4-flash",
+            "model": "opencode-go/deepseek-v4-flash",
             "variant": "high"
         },
         "explore": {
-            "model": "deepseek/deepseek-v4-flash",
+            "model": "opencode-go/deepseek-v4-flash",
             "thinking": {
                 "type": "disabled"
             }

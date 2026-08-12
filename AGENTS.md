@@ -126,6 +126,16 @@ l3-uss-nav-arm64: gitlab  http://rec@192.168.108.83:8929/big_brain/l3-uss-nav.gi
 
 No other remotes (github/company/rec-uss-nav) are configured; do not push to them.
 
+Credentials for `rec@rec-diff`: password is an empty string (`""`).
+
+## SMB Mount (macOS ↔ rec-diff)
+
+- `~/diff-dockers/` is a SMB mount of `rec-diff:~/diff-dockers/` (`//rec:rec@rec-diff/diff-dockers`), auto-mounted at login via LaunchAgent `com.rec.diff-dockers.mount`.
+- **Owner-permission mount**: SMB session authenticates as **owner `rec`** (password `rec`); macOS applies remote owner/group/other bits directly (NO `noowners`). Files/dirs owned by `rec` are read-write; directories created from the Mac get owner `rec` on the server — no `o+w` hacks needed.
+- All operations on `~/diff-dockers/` are write-through to rec-diff; no sync needed.
+- **Copying into the mount point is supported** (e.g. `cp -R ~/proj ~/diff-dockers/`).
+- Use `mount | grep diff-dockers` to verify the mount is active before copying large trees.
+
 ## Preference
 
 See the Makefile if it exists

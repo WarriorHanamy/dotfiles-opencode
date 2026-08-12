@@ -112,6 +112,54 @@ else
 fi
 ```
 
+### 6b. GitLab host & authentication (tested 2026-08)
+
+Internal GitLab runs at `192.168.20.89:8929` (HTTP, not HTTPS) on host
+`rec-diff`. Proven usage:
+
+```
+# glab defaults to gitlab.com — always pin the internal host via env.
+# Do NOT use `glab --hostname host:port`: it errors "invalid hostname".
+GITLAB_HOST=192.168.20.89:8929 glab api user        # auth check → username rec
+```
+
+Authentication (one-time, keyring-backed):
+
+```
+# Token source: /home/rec/.config/glab-cli/config.yml hosts section on rec-diff
+ssh rec@rec-diff 'grep -A15 "192.168.20.89:8929" /home/rec/.config/glab-cli/config.yml | grep -E "^[[:space:]]*token:" | head -1 | sed "s/^[[:space:]]*token:[[:space:]]*//"'
+
+# --api-protocol http and --git-protocol http are REQUIRED (server is HTTP;
+# default https fails with "HTTP response to HTTPS client")
+glab auth login --hostname 192.168.20.89:8929 \
+  --api-protocol http --git-protocol http --token <token>
+```
+
+Git push credentials (needed because remote URLs embed `http://rec@...`):
+
+```
+printf 'http://rec:<token>@192.168.20.89:8929\n' >> ~/.git-credentials
+chmod 600 ~/.git-credentials
+git config --global --add credential.helper store
+git ls-remote gitlab main   # verify before pushing
+```
+
+API discovery (project path needs `%2F` encoding):
+
+```
+GITLAB_HOST=192.168.20.89:8929 glab api "groups?simple=true"
+GITLAB_HOST=192.168.20.89:8929 glab api "groups/3/projects?per_page=100"
+GITLAB_HOST=192.168.20.89:8929 glab api "projects/big_brain%2Fl0-sensors"
+```
+
+Create a new project (same namespace, private, then add remote and push full history):
+
+```
+GITLAB_HOST=192.168.20.89:8929 glab repo create big_brain/<name> --private --description "..."
+git remote add <name> http://rec@192.168.20.89:8929/big_brain/<name>.git
+git push <name> <branch>
+```
+
 ### 7. Tag and release
 
 When the user requests a release ("release as vX.Y.Z", "tag", "发布", etc.):
@@ -137,15 +185,16 @@ When the user requests a release ("release as vX.Y.Z", "tag", "发布", etc.):
 
     REPO=$(git remote get-url gitlab | sed -E 's|.*[:/]([^/]+/[^/]+?)(\.git)?$|\1|' | sed 's|\.git$||')
 
-   glab release create <version> \
+   GITLAB_HOST=192.168.20.89:8929 glab release create <version> \
      --repo "$REPO" \
      --name "<version>" \
      --notes "<description>" \
      --tag-message "<description>"
    ```
 
-   `glab` must be authenticated (config or `GITLAB_TOKEN` env var). If `glab`
-   release creation fails, report the error — do not silently skip it.
+   `glab` must be authenticated (keyring via `glab auth login`, or
+   `GITLAB_TOKEN` env var). If `glab` release creation fails, report the error —
+   do not silently skip it.
 
 ## Commit Message Examples
 
@@ -175,3 +224,5 @@ rounded up instead of truncating.
 - Subject line: imperative mood, ≤50 characters, no trailing period.
 - Body: prose paragraph, no lists or templates.
 - A release request = annotated tag + `git push <remote> <tag>` + `glab release create` (GitLab Release object, not just the tag).
+- Internal GitLab API calls and `glab` must be prefixed with `GITLAB_HOST=192.168.20.89:8929`; never rely on the default `gitlab.com` host.
+- Verify GitLab credentials (`git ls-remote gitlab main`) before pushing; if auth fails, extract the token from rec-diff as in section 6b.
