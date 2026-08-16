@@ -50,6 +50,31 @@
 - Host system: Arch Linux with Hyprland (Wayland).
 - For ROS/PX4 projects, always use Docker containers to ensure environment consistency.
 
+## Remote Hosts
+
+| Name | Host | User | Auth | Note |
+|------|------|------|------|------|
+| diff-j30-backup | 192.168.22.0 | diff | SSH key (passwordless, installed) | J30 backup host; initial password was `1` |
+| mac (client) | 192.168.200.102 | hanamywarrior | SSH key (this host's authorized_keys) | opencode attach client; arm64 image builder; no SMB |
+| jetson (diff) | 192.168.200.201 / 192.168.55.1 | nv | SSH key | arm64 deployment device; docker pull consumer |
+
+## Development Topology (remote agent)
+
+This host (rec-diff) is the development mainstage: source, git, docker
+registry, and the opencode server. The Mac is a thin client that attaches to
+the opencode server over ZeroTier.
+
+- opencode server: systemd user unit `opencode-serve.service`, listens on
+  `192.168.200.101:4096` (ufw 4096/tcp), basic auth user `opencode`.
+- Mac client: `oc-remote` (`~/bin/oc-remote` on the Mac) — interactive attach
+  or one-shot run against this server.
+- Source of truth: `/home/rec/diff-dockers/` (each `l*` dir is its own repo).
+- Git remotes: `localhost:8929` (gitlab-tunnel.service -> cloud GitLab).
+- Docker registry: `192.168.200.101:5000` (diff-registry, user `rec`,
+  empty password) — canonical image path Mac/rec-diff -> Jetson.
+- The agent always runs HERE (rec-diff), never on the Mac. Mac-local skills
+  are injected per-session by `oc-remote -s <skill>` (run mode only).
+
 ## Shell Environment
 
 | Context | Shell | Note |
@@ -131,8 +156,8 @@ Requirements:
 Each uss-nav repo has a single remote on the local GitLab; pushes go straight there:
 
 ```
-l3-uss-nav-amd64: origin  http://192.168.20.89:8929/big_brain/l3-uss-nav-amd64.git
-l3-uss-nav-arm64: gitlab  http://rec@192.168.20.89:8929/big_brain/l3-uss-nav.git
+l3-dispatcher-planner: origin http://localhost:8929/big_brain/l3-dispatcher-planner.git
+l3-uss-nav-arm64:      gitlab  http://localhost:8929/big_brain/l3-uss-nav.git
 ```
 
 No other remotes (github/company/rec-uss-nav) are configured; do not push to them.
