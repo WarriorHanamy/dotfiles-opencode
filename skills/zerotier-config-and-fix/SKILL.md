@@ -14,7 +14,8 @@ This host (rec-arch) is a LEAF node (`d5985e38e4`) in network `3b19b3a7162c47f4`
 | rec-arch (this host) | `d5985e38e4` | 192.168.200.101/24 | 192.168.20.89 | LEAF |
 | rec-mac | `9b439c3fcb` | 192.168.200.102/24 | 192.168.21.91 | LEAF, Mac mini |
 | rec-pad | `8c3a3fbace` | 192.168.200.1/24 | 14.103.218.102 | MOON, tablet |
-| diff-j30-backup | `fcf494ad8f` | 192.168.200.201/24 | 192.168.22.0 (WiFi) | LEAF, J30 backup host — SAME device as the Jetson (ZT IP 200.201); LAN fallback `ssh diff@192.168.22.0` (see "Jetson fallback path"); holds `J30V2-orange` key authorized on rec-diff for `rec@` (see "Jetson ↔ rec-diff passwordless SSH") |
+| diff-j30-backup | `fcf494ad8f` | 192.168.200.201/24 | 192.168.10.131 (WiFi) | LEAF, J30 backup host — SAME device as the Jetson (ZT IP 200.201); LAN fallback `ssh diff@192.168.10.131` (see "Jetson fallback path"); holds `J30V2-orange` key authorized on rec-diff for `rec@` (see "Jetson ↔ rec-diff passwordless SSH") |
+| jetson-c5 | `62f50a806d` | 192.168.200.202/24 | 192.168.22.81 (WiFi `DiffRobot_5G`) | LEAF, Jetson C5 (hostname `jetson-c5`, login user `diff`); LAN fallback `ssh diff@192.168.22.81` (see "Jetson C5 fallback path"); rec-diff `~/.ssh/id_ed25519` authorized 2026-08-17 |
 | controller | `3b19b3a716` | — | 35.209.108.188 | network controller, auto-authorizes |
 | moon operator | `a40d1da253` | — | 180.184.176.190 | MOON, registered via `orbit` |
 | b278f58fad | `b278f58fad` | — | RELAY (no path yet) | LEAF 1.14.2, unknown hostname |
@@ -97,17 +98,17 @@ re-check; planets remain active roots alongside the moon.
 ## Jetson fallback path (WiFi LAN, no ZT)
 
 The Jetson (`diff@192.168.200.201`, ZT) has a plain-LAN fallback that does
-NOT depend on ZeroTier: **`ssh diff@192.168.22.0`**. rec-diff wlan0 is
-`192.168.20.89/22` and the Jetson WiFi is `192.168.22.0/22` — both inside
-`192.168.20.0/22`, so they reach each other directly over WiFi (no ZT, no
-route needed). Note `192.168.22.0` is a legitimate HOST address on the /22
-(broadcast 192.168.23.255), not a network address.
+NOT depend on ZeroTier: **`ssh diff@192.168.10.131`**. rec-diff wlan0 is
+`192.168.20.89/22` and the Jetson WiFi is `192.168.10.131/22` — reachable via
+the default gateway `192.168.20.1` (different /22, not a same-subnet direct
+link). The IP was `192.168.22.0` before 2026-08-16; it is DHCP-assigned, so
+re-verify with `arp-scan` / `ping 192.168.10.131` if it changes again.
 
 Jetson interface topology:
 
 | Iface | Address | Purpose |
 |-------|---------|---------|
-| `wlP1p1s0` | `192.168.22.0/22` | WiFi management LAN — ZeroTier traffic theoretically exits here |
+| `wlP1p1s0` | `192.168.10.131/22` | WiFi management LAN (DHCP; was `192.168.22.0` pre-2026-08-16) — ZeroTier traffic theoretically exits here |
 | `eno1` | `192.168.2.50/24` | **LiDAR link, NOT a network path** — never try to reach the Jetson via 192.168.2.x |
 | `zttqhz7yhc` | `192.168.200.201/24` | ZeroTier overlay |
 
@@ -115,24 +116,51 @@ Fixed 2026-08-14 (previously degraded):
 
 - Symptom: `ping 192.168.200.201` from rec-diff 100% loss, reverse also 100%
   loss — ZT tunnel half-open in BOTH directions. Both services healthy,
-  rec-diff `peers` showed Jetson DIRECT via `192.168.22.0/56809`, but the
+  rec-diff `peers` showed Jetson DIRECT via `192.168.10.131/56809`, but the
   Jetson's `peers` had NO row for rec-diff (`d5985e38e4`).
 - Fix: `sudo systemctl restart zerotier-one` on BOTH hosts (rec-diff locally,
-  Jetson via `ssh diff@192.168.22.0`). After ~15 s both `peers` tables show the
-  other side DIRECT (rec-diff via `192.168.22.0/9993`, Jetson via
+  Jetson via `ssh diff@192.168.10.131`). After ~15 s both `peers` tables show the
+  other side DIRECT (rec-diff via `192.168.10.131/9993`, Jetson via
   `192.168.20.89/9993`); pings then 0% loss both directions; registry
   `https://192.168.200.101:5000/v2/` reachable from Jetson over ZT.
 - Bonus: controller row (`3b19b3a716`) went from RELAY (no path) to DIRECT after
   the restart.
+- Verified 2026-08-16: Jetson WiFi IP moved to `192.168.10.131` (DHCP);
+  rec-diff `ping 192.168.200.201` showed Destination Host Unreachable (ARP
+  INCOMPLETE on `zttqhz7yhc`), ZT peers still DIRECT with growing counters.
+  Found the new IP via the k8s NODE column (`kubectl get pods -o wide`) /
+  ZT peer `path` `192.168.10.131/9993`. Restarting zerotier-one on BOTH
+  sides restored the tunnel in ~10 s.
 
-Rule: when ZT to 200.201 is down, use `ssh diff@192.168.22.0` for all
+Rule: when ZT to 200.201 is down, use `ssh diff@192.168.10.131` for all
 management. Caveats: the docker registry (`192.168.200.101:5000`) has no TLS
 SAN for the wlan0 IP (192.168.20.89), so image pulls do NOT work over the
 LAN fallback — ZT must be restored for registry traffic (or re-issue certs).
 Note the LAN path is management-only and does NOT exercise the ZT data plane;
-a ZT failure that survives `ssh diff@192.168.22.0` connectivity is a pure
+a ZT failure that survives `ssh diff@192.168.10.131` connectivity is a pure
 tunnel/firewall problem (see "Firewall: ufw MUST allow zerotier's 9993/udp"
 and Troubleshooting).
+
+## Jetson C5 fallback path (WiFi LAN, no ZT)
+
+The Jetson C5 (`jetson-c5`, ZT `192.168.200.202`) has a plain-LAN fallback that
+does NOT depend on ZeroTier: **`ssh diff@192.168.22.81`** (passwordless, key
+auth configured 2026-08-17). Its WiFi SSID is `DiffRobot_5G` (5 GHz ch52). The
+LAN IP `192.168.22.81/22` shares the `192.168.20.0/22` subnet with rec-diff
+wlan0 (`192.168.20.89/22`) and the same default gateway `192.168.20.1`, so it
+is directly reachable without routing. It is DHCP-assigned; re-verify with
+`arp-scan -l -I wlan0` / `ping 192.168.22.81` if it changes.
+
+Jetson C5 interface topology:
+
+| Iface | Address | Purpose |
+|-------|---------|---------|
+| `wlP1p1s0` | `192.168.22.81/22` | WiFi management LAN (DHCP, SSID `DiffRobot_5G`) — ZeroTier traffic exits here |
+| `l4tbr0` | `192.168.55.1/24` | USB device-mode bridge (down), like the V25 Jetson |
+| `zttqhz7yhc` | `192.168.200.202/24` | ZeroTier overlay |
+
+Verified 2026-08-17: ZT peer `62f50a806d` DIRECT via `192.168.22.81/35001`,
+`ping 192.168.200.202` 0% loss; LAN ping to 192.168.22.81 0% loss.
 
 ## Jetson ↔ rec-diff passwordless SSH
 
@@ -140,7 +168,7 @@ Bidirectional key auth (all keys ed25519, no passphrase):
 
 | Direction | Command | Key |
 |-----------|---------|-----|
-| rec-diff → Jetson | `ssh diff@192.168.200.201` (ZT) / `ssh diff@192.168.22.0` (LAN) | rec-diff `~/.ssh/id_ed25519` → Jetson `~diff/.ssh/authorized_keys` |
+| rec-diff → Jetson | `ssh diff@192.168.200.201` (ZT) / `ssh diff@192.168.10.131` (LAN) | rec-diff `~/.ssh/id_ed25519` → Jetson `~diff/.ssh/authorized_keys` |
 | Jetson → rec-diff | `ssh rec@192.168.200.101` (ZT) / `ssh rec@192.168.20.89` (LAN) | Jetson `~diff/.ssh/id_ed25519` (`J30V2-orange`) → rec-diff `~rec/.ssh/authorized_keys` |
 
 Configured 2026-08-14. Jetson-side gotcha: `~diff/.ssh/known_hosts` was
@@ -161,7 +189,7 @@ ssh still connects but warns "Failed to add the host"; fix is
   side's `peers` table is missing the other's row (e.g. Jetson missing rec-diff):
   tunnel half-open, session never established. Restart zerotier-one on both hosts
   and re-check `peers`; while degraded, use the Jetson LAN fallback
-  (`ssh diff@192.168.22.0`, same 192.168.20.0/22 subnet — see above).
+  (`ssh diff@192.168.10.131`, WiFi DHCP — see above).
   (Verified 2026-08-14: dual restart alone restored the link, 0% loss in ~15 s,
   no moon/orbit changes needed.)
 - Both sides show the other DIRECT with counters growing, but ZT ping/SSH/

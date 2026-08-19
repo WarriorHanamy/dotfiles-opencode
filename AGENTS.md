@@ -54,9 +54,11 @@
 
 | Name | Host | User | Auth | Note |
 |------|------|------|------|------|
-| diff-j30-backup | 192.168.22.0 | diff | SSH key (passwordless, installed) | J30 backup host; initial password was `1` |
+| diff-j30-backup | 192.168.10.131 (WiFi, was 192.168.22.0) | diff | SSH key (passwordless, installed) | J30 backup host; initial password was `1` |
+| jetson-j30 | 192.168.200.201 | diff | SSH key + password `1` | Jetson AGX Orin — arm64 production device (k3s, ns `lx-real`); docker pull consumer; `nv` user does NOT exist; also reachable as `jetson-j30` |
+| jetson-c5 | 192.168.200.202 | diff | SSH key + password `1` | New test device (Ubuntu 24.04 aarch64, k3s v1.36.3) — containerd-native container standard test bed; LAN `192.168.22.81` |
 | mac (client) | 192.168.200.102 | hanamywarrior | SSH key (this host's authorized_keys) | opencode attach client; arm64 image builder; no SMB |
-| jetson (diff) | 192.168.200.201 / 192.168.55.1 | nv | SSH key | arm64 deployment device; docker pull consumer |
+| gitlab (cloud) | 129.211.229.251, tunneled to localhost:8929 | rec | HTTP PAT (libsecret) | self-hosted GitLab; all l* repos push here |
 
 ## Development Topology (remote agent)
 
@@ -69,11 +71,44 @@ the opencode server over ZeroTier.
 - Mac client: `oc-remote` (`~/bin/oc-remote` on the Mac) — interactive attach
   or one-shot run against this server.
 - Source of truth: `/home/rec/diff-dockers/` (each `l*` dir is its own repo).
-- Git remotes: `localhost:8929` (gitlab-tunnel.service -> cloud GitLab).
-- Docker registry: `192.168.200.101:5000` (diff-registry, user `rec`,
-  empty password) — canonical image path Mac/rec-diff -> Jetson.
+  Exception: `l4-agent/` and `l4-agent-log-visualizer/` are Mac-exclusive
+  (dev + run + push on 192.168.200.102); rec-diff keeps read-baks at
+  `~/diff-dockers/readonly/l4-agent/` and `~/diff-dockers/readonly/l4-agent-log-visualizer/` (git pull
+  only). See "Terms".
+- Git remotes: `localhost:8929` (gitlab-tunnel.service -> GitLab; see Remote Hosts table).
+- Docker registry: `192.168.200.101:5000` (diff-registry, HTTPS, no auth) —
+  canonical image path Mac/rec-diff -> Jetson.
 - The agent always runs HERE (rec-diff), never on the Mac. Mac-local skills
   are injected per-session by `oc-remote -s <skill>` (run mode only).
+
+### Docker image build & distribution
+
+Who builds what (each arch builds natively on its own host; no cross-arch
+buildx/qemu):
+
+| Arch                     | Built where                                    | Why              | Distribute via                                    |
+|--------------------------|------------------------------------------------|------------------|---------------------------------------------------|
+| amd64 (all, incl. l4)    | rec-diff (`make build`, x86_64 native)         | rec-diff is amd64 | none — built and used locally on rec-diff, never pushed to the registry |
+| arm64 (l0/l1/l2/l3)      | Mac (`make build`, Apple Silicon native)       | Mac is arm64     | docker push -> rec-diff registry -> Jetson pull   |
+
+(l4-agent is NOT in this table — fully native since 2026-08, no image, no
+registry traffic.)
+
+Push (from the builder, Mac or rec-diff):
+
+```bash
+docker tag <local-image>:latest 192.168.200.101:5000/<repo>:latest
+docker push 192.168.200.101:5000/<repo>:latest        # no docker login required (anonymous HTTPS)
+```
+
+Pull on Jetson (arm64):
+
+```bash
+docker pull 192.168.200.101:5000/<repo>:latest     # Jetson consumer (jetson-j30 192.168.200.201)
+```
+
+Fallback when the registry is unreachable: `docker save <img> | gzip` -> scp
+to Jetson -> `gzip -dc | docker load` (bring-up only).
 
 ## Shell Environment
 
@@ -146,21 +181,25 @@ Requirements:
 
 - When operating across repositories, first read `<target-repo>/AGENTS.md` to understand its conventions, build system, and project-specific rules.
 
+## Terms
+
+- **source of truth**: the host/repo where dev + commit + push happen for a
+  given project. Usually rec-diff; for Mac-exclusive projects
+  (`l4-agent`, `l4-agent-log-visualizer`) it is the Mac.
+- **read-bak**: a read-only git clone of a repo kept on a host that does NOT
+  own the repo (e.g. rec-diff `~/diff-dockers/readonly/<repo>/`). Purpose: read/query the
+  code locally without needing the owning host. Rules: `git pull` only,
+  never commit/push, never edit files. It is a backup-for-reading, NOT a
+  Docker image mirror — never call it 镜像 / "mirror"; that word is reserved
+  for Docker images in this workspace.
+- **builder clone**: a working git clone on the Mac under `~/lx-build/` used
+  only for arm64 builds (git pull -> compile -> artifacts-push); edits are
+  forbidden (rec-diff owns those repos).
+
 ## Git Naming Convention
 
 - "main" (unqualified) always means the **local** main branch.
 - "origin/main", "remote main", or "gitlab/main" explicitly mean the remote branch.
-
-## Git Remotes (uss-nav)
-
-Each uss-nav repo has a single remote on the local GitLab; pushes go straight there:
-
-```
-l3-dispatcher-planner: origin http://localhost:8929/big_brain/l3-dispatcher-planner.git
-l3-uss-nav-arm64:      gitlab  http://localhost:8929/big_brain/l3-uss-nav.git
-```
-
-No other remotes (github/company/rec-uss-nav) are configured; do not push to them.
 
 ## Preference
 
